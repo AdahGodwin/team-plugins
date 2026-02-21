@@ -33,7 +33,7 @@ const ig = {
 
     // Forms
     email:               'Adreesị Ozi Eletronik',
-    password:            'Okwuntughe',
+    // password:            'Okwuntughe',
     forgotPassword:      'Chefuo okwuntughe?',
     login:               'Banye',
     register:            'Mepụta Akaụntụ',
