@@ -19,7 +19,7 @@ const features = [
     {
         icon: <MessageCircle className="w-5 h-5" />,
         title: 'Personalized Guidance',
-        description: 'Stage-based preventive advice tailored to each patient\'s recovery phase, history, and behavioral patterns.',
+        description: "Stage-based preventive advice tailored to each patient's recovery phase, history, and behavioral patterns.",
     },
     {
         icon: <Lock className="w-5 h-5" />,
@@ -35,35 +35,38 @@ const features = [
 
 const Features = () => {
     return (
-        <section id="features" className="bg-slate-950 py-24">
+        <section id="features" className="bg-slate-50 py-24">
             <div className="max-w-6xl mx-auto px-6">
+
+                {/* Section label — auth pill style */}
                 <div className="flex justify-center mb-6">
-                    <span className="inline-flex items-center border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                    <span className="inline-flex items-center gap-2 border border-blue-100 bg-blue-50 text-blue-600 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
                         Platform Capabilities
                     </span>
                 </div>
 
-                <h2 className="text-4xl md:text-5xl font-extrabold text-white text-center mb-4 tracking-tight">
+                <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 text-center mb-4 tracking-tight">
                     Built for{' '}
-                    <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                    <span className="bg-linear-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">
                         Life After Discharge
                     </span>
                 </h2>
-                <p className="text-center text-slate-400 text-lg max-w-2xl mx-auto mb-16">
+                <p className="text-center text-slate-500 text-lg max-w-2xl mx-auto mb-16">
                     Every feature is designed around one goal: ensuring no stroke survivor falls through the gaps of the healthcare system.
                 </p>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
                     {features.map((feature) => (
                         <div
                             key={feature.title}
-                            className="group bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-blue-500/40 hover:bg-slate-800/80 transition-all"
+                            className="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-teal-200 hover:bg-teal-50/30 hover:shadow-md transition-all shadow-sm ring-1 ring-slate-50"
                         >
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-lg flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                            <div className="w-11 h-11 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white mb-5 shadow-sm group-hover:scale-105 transition-transform">
                                 {feature.icon}
                             </div>
-                            <h3 className="text-white font-bold text-lg mb-2">{feature.title}</h3>
-                            <p className="text-slate-400 text-sm leading-relaxed">{feature.description}</p>
+                            <h3 className="text-slate-900 font-bold text-base mb-2">{feature.title}</h3>
+                            <p className="text-slate-500 text-sm leading-relaxed">{feature.description}</p>
                         </div>
                     ))}
                 </div>
