@@ -87,8 +87,28 @@ const PreCare = () => {
                     Whether you&apos;re at risk or supporting a loved one, Aegis AI helps you build protective health habits — logging, analyzing, and guiding you every step of the way.
                 </p>
 
-                <div className="grid md:grid-cols-2 gap-12 items-start mb-16">
-                    {/* Left: Log & notification features */}
+                {/* Image + Feature cards row */}
+                <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+                    {/* Left: Image */}
+                    <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-100">
+                        <img
+                            src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=800&q=80"
+                            alt="Person logging health data on a smartphone"
+                            className="w-full h-[460px] object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
+                        <div className="absolute bottom-5 left-5 right-5 bg-white/95 backdrop-blur rounded-2xl p-4 flex items-center gap-3 shadow-lg">
+                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center text-white shrink-0">
+                                <Bell className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <p className="text-slate-900 text-sm font-bold">Weekly check-in reminder</p>
+                                <p className="text-slate-500 text-xs">Aegis AI · Log your health data now</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right: Log & notification features */}
                     <div className="space-y-5">
                         {logFeatures.map((feature) => (
                             <div
@@ -105,30 +125,29 @@ const PreCare = () => {
                             </div>
                         ))}
                     </div>
+                </div>
 
-                    {/* Right: Notification mockup + preventive measures */}
-                    <div className="space-y-6">
-                        {/* Notification mockup */}
-                        <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800">
-                            <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-4">Smart Notifications</p>
-                            {notifications.map((notif) => (
-                                <div
-                                    key={notif.msg}
-                                    className={`flex items-start gap-3 p-3 rounded-xl mb-3 last:mb-0 ${notif.type === 'warning'
+                {/* Notification mockup row */}
+                <div className="bg-slate-950 rounded-2xl p-6 border border-slate-800 mb-12">
+                    <p className="text-slate-400 text-xs font-medium uppercase tracking-widest mb-4">Smart Notifications</p>
+                    <div className="grid md:grid-cols-3 gap-3">
+                        {notifications.map((notif) => (
+                            <div
+                                key={notif.msg}
+                                className={`flex items-start gap-3 p-3 rounded-xl ${notif.type === 'warning'
                                         ? 'bg-amber-500/10 border border-amber-500/20'
                                         : notif.type === 'insight'
                                             ? 'bg-emerald-500/10 border border-emerald-500/20'
                                             : 'bg-blue-500/10 border border-blue-500/20'
-                                        }`}
-                                >
-                                    <notif.Icon className={`w-5 h-5 shrink-0 mt-0.5 ${notif.iconColor}`} />
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-white text-sm leading-snug">{notif.msg}</p>
-                                        <p className="text-slate-500 text-xs mt-1">{notif.time}</p>
-                                    </div>
+                                    }`}
+                            >
+                                <notif.Icon className={`w-5 h-5 shrink-0 mt-0.5 ${notif.iconColor}`} />
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-white text-sm leading-snug">{notif.msg}</p>
+                                    <p className="text-slate-500 text-xs mt-1">{notif.time}</p>
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
 

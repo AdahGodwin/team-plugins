@@ -14,6 +14,18 @@ const CTASection = () => {
             </div>
 
             <div className="relative max-w-4xl mx-auto px-6 text-center">
+                {/* Image row */}
+                <div className="flex gap-3 mb-12 justify-center">
+                    {[
+                        { src: 'https://images.unsplash.com/photo-1559000357-f6b52ddfbe37?w=400&q=80', alt: 'Doctor reviewing patient data' },
+                        { src: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&q=80', alt: 'Patient using health monitoring app' },
+                        { src: 'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=400&q=80', alt: 'Family member supporting recovery' },
+                    ].map(({ src, alt }) => (
+                        <div key={alt} className="flex-1 rounded-2xl overflow-hidden h-40 shadow-md">
+                            <img src={src} alt={alt} className="w-full h-full object-cover" />
+                        </div>
+                    ))}
+                </div>
                 <h2 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
                     Your Health Partner,{' '}
                     <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">

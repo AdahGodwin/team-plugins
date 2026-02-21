@@ -57,7 +57,7 @@ const Caretaker = () => {
                     Assign a trusted relative or friend as a caretaker. They can monitor the patient&apos;s health trends, receive alerts, and log health data on their behalf — ensuring no one faces recovery alone.
                 </p>
 
-                <div className="grid md:grid-cols-2 gap-12 items-center">
+                <div className="grid md:grid-cols-2 gap-12 items-center mb-12">
                     {/* Left: Capabilities */}
                     <div className="space-y-5">
                         {capabilities.map(({ Icon, title, description }) => (
@@ -76,70 +76,52 @@ const Caretaker = () => {
                         ))}
                     </div>
 
-                    {/* Right: Visual mockup */}
-                    <div className="bg-slate-950 rounded-3xl p-8 border border-slate-800">
-                        {/* Header */}
-                        <div className="flex items-center justify-between mb-6">
-                            <div>
-                                <p className="text-slate-400 text-xs uppercase tracking-widest mb-1">Monitoring</p>
-                                <p className="text-white font-bold text-lg">John Adeyemi</p>
-                                <p className="text-slate-500 text-xs">Patient · Post-stroke recovery</p>
-                            </div>
-                            <div className="flex items-center gap-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full px-3 py-1">
-                                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                                <span className="text-emerald-400 text-xs font-semibold">Low Risk</span>
-                            </div>
+                    {/* Right: Image + floating mockup */}
+                    <div className="relative">
+                        <div className="relative rounded-3xl overflow-hidden shadow-xl border border-slate-200">
+                            <img
+                                src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?w=800&q=80"
+                                alt="A family member helping an elderly patient with health monitoring"
+                                className="w-full h-[460px] object-cover object-top"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
                         </div>
 
-                        {/* Trend mini chart (decorative) */}
-                        <div className="flex items-end gap-1.5 h-16 mb-6">
-                            {[40, 55, 48, 62, 58, 72, 65, 70, 60, 68, 55, 63].map((h, i) => (
-                                <div
-                                    key={i}
-                                    className={`flex-1 rounded-sm transition-all ${i === 11 ? 'bg-violet-500' : 'bg-slate-700'}`}
-                                    style={{ height: `${h}%` }}
-                                />
-                            ))}
-                        </div>
-                        <p className="text-slate-500 text-xs mb-6">Adherence score — last 12 days</p>
-
-                        {/* Log entry widget */}
-                        <div className="bg-slate-900 rounded-xl p-4 border border-slate-800 mb-4">
+                        {/* Floating log entry card */}
+                        <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 w-64">
                             <div className="flex items-center gap-2 mb-3">
-                                <PenLine className="w-4 h-4 text-violet-400" />
-                                <span className="text-slate-300 text-xs font-semibold">Log entry by caretaker</span>
+                                <PenLine className="w-4 h-4 text-violet-500" />
+                                <span className="text-slate-700 text-xs font-semibold">Logged by caretaker</span>
                             </div>
                             <div className="grid grid-cols-2 gap-2 text-xs">
                                 {[
-                                    { label: 'Blood Pressure', value: '128/82 mmHg' },
+                                    { label: 'Blood Pressure', value: '128/82' },
                                     { label: 'Medications', value: 'Taken ✓' },
                                     { label: 'Mood', value: 'Calm' },
                                     { label: 'Activity', value: 'Light walk' },
                                 ].map(({ label, value }) => (
-                                    <div key={label} className="bg-slate-800 rounded-lg p-2">
+                                    <div key={label} className="bg-slate-50 rounded-lg p-2">
                                         <p className="text-slate-500 mb-0.5">{label}</p>
-                                        <p className="text-white font-semibold">{value}</p>
+                                        <p className="text-slate-900 font-semibold">{value}</p>
                                     </div>
                                 ))}
                             </div>
-                        </div>
-
-                        {/* Caretaker info */}
-                        <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                A
+                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    A
+                                </div>
+                                <div>
+                                    <p className="text-slate-700 text-xs font-semibold">Amara <span className="text-slate-400 font-normal">· Sister</span></p>
+                                    <p className="text-slate-400 text-xs">2 mins ago</p>
+                                </div>
+                                <Eye className="w-3.5 h-3.5 text-slate-300 ml-auto" />
                             </div>
-                            <div className="flex-1">
-                                <p className="text-slate-300 text-xs font-semibold">Amara Adeyemi <span className="text-slate-500 font-normal">· Sister</span></p>
-                                <p className="text-slate-500 text-xs">Caretaker · Logged 2 mins ago</p>
-                            </div>
-                            <Eye className="w-4 h-4 text-slate-600" />
                         </div>
                     </div>
                 </div>
 
                 {/* Bottom callout strip */}
-                <div className="mt-12 bg-gradient-to-r from-violet-600 to-blue-600 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 text-white">
+                <div className="mt-16 bg-gradient-to-r from-violet-600 to-blue-600 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 text-white">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
                             <UserPlus className="w-6 h-6" />
