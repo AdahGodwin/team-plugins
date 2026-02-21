@@ -12,6 +12,8 @@ class Patient(models.Model):
     
     # Required Caregiver Field
     caregiver_email = models.EmailField(help_text="Email of the primary caregiver")
+    caregiver_name = models.CharField(max_length=100, blank=True)
+    caregiver_phone = models.CharField(max_length=15, blank=True)
     
     # Optional: basic medical record tracking
     blood_group = models.CharField(max_length=5, blank=True)

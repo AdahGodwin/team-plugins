@@ -3,9 +3,12 @@ from datetime import date
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from .models import MedicalRecord
 from .serializers import VitalSignLogSerializer
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+
+from apps.patients.models import Patient
+from apps.patients.serializers import PatientProfileSerializer
 
 class PredictHealthOutcomeView(APIView):
     # Ensure only logged-in patients with a valid token can access this
@@ -74,3 +77,39 @@ class PredictHealthOutcomeView(APIView):
             "prediction": prediction_data,
             "payload_sent_to_ml": ml_payload  # Useful for debugging your Flask endpoint
         }, status=status.HTTP_201_CREATED)
+
+class PatientVitalHistoryView(APIView):
+    """ Allows a logged-in patient to see their own history """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        patient_profile = request.user.patient_profile
+        logs = VitalSignLog.objects.filter(patient=patient_profile)
+        serializer = VitalHistorySerializer(logs, many=True)
+        
+        return Response({
+            "patient_name": f"{request.user.first_name} {request.user.last_name}",
+            "history": serializer.data
+        }, status=status.HTTP_200_OK)
+
+
+class AdminPatientDetailView(APIView):
+    """ Allows hospital staff to see any patient's full file """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, patient_id):
+        # 1. Find the specific patient
+        patient = get_object_or_404(Patient, id=patient_id)
+        
+        # 2. Serialize their baseline profile
+        profile_serializer = PatientProfileSerializer(patient)
+        
+        # 3. Fetch and serialize their vital sign history
+        logs = VitalSignLog.objects.filter(patient=patient)
+        history_serializer = VitalHistorySerializer(logs, many=True)
+        
+        # 4. Return everything in one comprehensive package
+        return Response({
+            "patient_profile": profile_serializer.data,
+            "vital_history": history_serializer.data
+        }, status=status.HTTP_200_OK)
