@@ -1,0 +1,428 @@
+export type RiskLevel = 'low' | 'moderate' | 'high'
+
+export interface CaretakerMessage {
+    id: string
+    from: 'admin' | 'caretaker'
+    text: string
+    timestamp: string
+}
+
+export interface Caretaker {
+    name: string
+    relation: string
+    phone: string
+}
+
+export interface Patient {
+    uuid: string
+    name: string
+    age: number
+    gender: string
+    diagnosis: string
+    riskLevel: RiskLevel
+    lastLog: string
+    medications: string[]
+    bloodPressure: string
+    heartRate: number
+    oxygenSat: number
+    healthStatus: 'Stable' | 'Monitoring' | 'Critical'
+    clinicalNotes: string
+    caretaker: Caretaker | null
+    caretakerMessages: CaretakerMessage[]
+    lastEscalation?: string
+}
+
+const makeMsg = (
+    id: string,
+    from: 'admin' | 'caretaker',
+    text: string,
+    timestamp: string,
+): CaretakerMessage => ({ id, from, text, timestamp })
+
+export const patients: Patient[] = [
+    {
+        uuid: 'ae1f2c3d-0001-4b5e-8f9a-000000000001',
+        name: 'John Adeyemi',
+        age: 67,
+        gender: 'Male',
+        diagnosis: 'Ischemic stroke — left hemisphere',
+        riskLevel: 'high',
+        lastLog: '2026-02-20T08:12:00Z',
+        medications: ['Aspirin 75mg', 'Atorvastatin 40mg', 'Lisinopril 10mg'],
+        bloodPressure: '158/96',
+        heartRate: 88,
+        oxygenSat: 95,
+        healthStatus: 'Critical',
+        clinicalNotes: 'Patient showed significant adherence drop over the last 5 days. BP trending upward. Referred for urgent review.',
+        caretaker: { name: 'Amara Adeyemi', relation: 'Daughter', phone: '+234 801 234 5678' },
+        caretakerMessages: [
+            makeMsg('m1', 'admin', 'Please ensure John takes his evening medications. Risk level is high.', '2026-02-19T17:00:00Z'),
+            makeMsg('m2', 'caretaker', 'Understood. He took them at 8pm. He also complained of a slight headache.', '2026-02-19T21:15:00Z'),
+        ],
+        lastEscalation: '2026-02-20T08:00:00Z',
+    },
+    {
+        uuid: 'ae1f2c3d-0002-4b5e-8f9a-000000000002',
+        name: 'Fatima Al-Hassan',
+        age: 54,
+        gender: 'Female',
+        diagnosis: 'Hemorrhagic stroke — basal ganglia',
+        riskLevel: 'high',
+        lastLog: '2026-02-19T14:30:00Z',
+        medications: ['Clopidogrel 75mg', 'Amlodipine 5mg'],
+        bloodPressure: '162/100',
+        heartRate: 92,
+        oxygenSat: 94,
+        healthStatus: 'Critical',
+        clinicalNotes: 'Persistent hypertension. Missed 3 medication doses this week. Caretaker notified twice.',
+        caretaker: { name: 'Yusuf Al-Hassan', relation: 'Husband', phone: '+234 802 345 6789' },
+        caretakerMessages: [
+            makeMsg('m3', 'admin', 'Fatima missed her morning dose. Please confirm administration.', '2026-02-19T10:00:00Z'),
+            makeMsg('m4', 'caretaker', 'She was not feeling well. We gave it at noon instead.', '2026-02-19T12:30:00Z'),
+        ],
+        lastEscalation: '2026-02-19T10:00:00Z',
+    },
+    {
+        uuid: 'ae1f2c3d-0003-4b5e-8f9a-000000000003',
+        name: 'Emmanuel Okafor',
+        age: 72,
+        gender: 'Male',
+        diagnosis: 'TIA — transient ischemic attack',
+        riskLevel: 'moderate',
+        lastLog: '2026-02-21T07:00:00Z',
+        medications: ['Aspirin 75mg', 'Ramipril 5mg'],
+        bloodPressure: '142/88',
+        heartRate: 76,
+        oxygenSat: 97,
+        healthStatus: 'Monitoring',
+        clinicalNotes: 'Recovery progressing. Minor speech difficulty noted last week, improving. Weekly check-ins maintained.',
+        caretaker: { name: 'Chisom Okafor', relation: 'Son', phone: '+234 803 456 7890' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0004-4b5e-8f9a-000000000004',
+        name: 'Grace Mensah',
+        age: 61,
+        gender: 'Female',
+        diagnosis: 'Ischemic stroke — right hemisphere',
+        riskLevel: 'low',
+        lastLog: '2026-02-21T06:45:00Z',
+        medications: ['Warfarin 5mg', 'Metoprolol 25mg', 'Atorvastatin 20mg'],
+        bloodPressure: '128/82',
+        heartRate: 68,
+        oxygenSat: 98,
+        healthStatus: 'Stable',
+        clinicalNotes: 'Excellent adherence. BP well controlled. Cleared for reduced monitoring frequency.',
+        caretaker: { name: 'Kofi Mensah', relation: 'Husband', phone: '+233 244 567 890' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0005-4b5e-8f9a-000000000005',
+        name: 'Musa Danjuma',
+        age: 59,
+        gender: 'Male',
+        diagnosis: 'Lacunar stroke',
+        riskLevel: 'moderate',
+        lastLog: '2026-02-20T11:00:00Z',
+        medications: ['Aspirin 75mg', 'Simvastatin 20mg'],
+        bloodPressure: '138/85',
+        heartRate: 80,
+        oxygenSat: 96,
+        healthStatus: 'Monitoring',
+        clinicalNotes: 'Moderate risk. Mood reported as anxious this week. Counseling referral pending.',
+        caretaker: null,
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0006-4b5e-8f9a-000000000006',
+        name: 'Adaeze Eze',
+        age: 48,
+        gender: 'Female',
+        diagnosis: 'Ischemic stroke — posterior circulation',
+        riskLevel: 'low',
+        lastLog: '2026-02-21T05:30:00Z',
+        medications: ['Clopidogrel 75mg', 'Rosuvastatin 10mg', 'Lisinopril 5mg'],
+        bloodPressure: '124/78',
+        heartRate: 65,
+        oxygenSat: 99,
+        healthStatus: 'Stable',
+        clinicalNotes: 'Full adherence streak of 21 days. Vision almost fully recovered. Excellent prognosis.',
+        caretaker: { name: 'Chukwuma Eze', relation: 'Brother', phone: '+234 804 567 8901' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0007-4b5e-8f9a-000000000007',
+        name: 'Taiwo Afolabi',
+        age: 76,
+        gender: 'Male',
+        diagnosis: 'Hemorrhagic stroke — subarachnoid',
+        riskLevel: 'high',
+        lastLog: '2026-02-18T09:00:00Z',
+        medications: ['Nimodipine 60mg', 'Paracetamol 500mg'],
+        bloodPressure: '170/105',
+        heartRate: 95,
+        oxygenSat: 93,
+        healthStatus: 'Critical',
+        clinicalNotes: 'Critical condition. 3-day logging gap. Emergency contact alerted. Hospitalization under review.',
+        caretaker: { name: 'Kehinde Afolabi', relation: 'Twin / Sister', phone: '+234 805 678 9012' },
+        caretakerMessages: [
+            makeMsg('m5', 'admin', 'Taiwo has not logged in 3 days. Please check on him urgently.', '2026-02-21T08:00:00Z'),
+        ],
+        lastEscalation: '2026-02-21T08:00:00Z',
+    },
+    {
+        uuid: 'ae1f2c3d-0008-4b5e-8f9a-000000000008',
+        name: 'Ngozi Nwosu',
+        age: 63,
+        gender: 'Female',
+        diagnosis: 'TIA — transient ischemic attack',
+        riskLevel: 'low',
+        lastLog: '2026-02-21T07:20:00Z',
+        medications: ['Aspirin 75mg'],
+        bloodPressure: '126/80',
+        heartRate: 70,
+        oxygenSat: 98,
+        healthStatus: 'Stable',
+        clinicalNotes: 'No recurrence. BP stable. Maintaining healthy lifestyle as advised.',
+        caretaker: null,
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0009-4b5e-8f9a-000000000009',
+        name: 'Suleiman Bello',
+        age: 69,
+        gender: 'Male',
+        diagnosis: 'Ischemic stroke — MCA territory',
+        riskLevel: 'moderate',
+        lastLog: '2026-02-20T16:00:00Z',
+        medications: ['Warfarin 3mg', 'Amlodipine 10mg', 'Atorvastatin 40mg'],
+        bloodPressure: '145/90',
+        heartRate: 82,
+        oxygenSat: 96,
+        healthStatus: 'Monitoring',
+        clinicalNotes: 'INR monitoring monthly. Adherence good but lifestyle changes slow to implement.',
+        caretaker: { name: 'Hauwa Bello', relation: 'Wife', phone: '+234 806 789 0123' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0010-4b5e-8f9a-000000000010',
+        name: 'Blessing Obi',
+        age: 44,
+        gender: 'Female',
+        diagnosis: 'Lacunar stroke',
+        riskLevel: 'low',
+        lastLog: '2026-02-21T06:00:00Z',
+        medications: ['Aspirin 75mg', 'Simvastatin 20mg', 'Ramipril 2.5mg'],
+        bloodPressure: '118/76',
+        heartRate: 62,
+        oxygenSat: 99,
+        healthStatus: 'Stable',
+        clinicalNotes: 'Youngest patient in cohort. Excellent recovery. No side effects reported.',
+        caretaker: { name: 'Emeka Obi', relation: 'Husband', phone: '+234 807 890 1234' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0011-4b5e-8f9a-000000000011',
+        name: 'Alhaji Garba',
+        age: 81,
+        gender: 'Male',
+        diagnosis: 'Ischemic stroke — bilateral',
+        riskLevel: 'high',
+        lastLog: '2026-02-19T10:00:00Z',
+        medications: ['Aspirin 75mg', 'Clopidogrel 75mg', 'Atorvastatin 80mg', 'Lisinopril 20mg'],
+        bloodPressure: '165/102',
+        heartRate: 90,
+        oxygenSat: 94,
+        healthStatus: 'Critical',
+        clinicalNotes: 'Bilateral involvement. Cognitive difficulties making self-reporting unreliable. Caretaker primary contact.',
+        caretaker: { name: 'Aisha Garba', relation: 'Daughter-in-law', phone: '+234 808 901 2345' },
+        caretakerMessages: [
+            makeMsg('m6', 'admin', 'Please monitor Al-Hajj Garba closely. Risk is critical.', '2026-02-20T09:00:00Z'),
+            makeMsg('m7', 'caretaker', 'He is resting. Ate well this morning. Will log vitals by 12pm.', '2026-02-20T10:30:00Z'),
+        ],
+        lastEscalation: '2026-02-20T09:00:00Z',
+    },
+    {
+        uuid: 'ae1f2c3d-0012-4b5e-8f9a-000000000012',
+        name: 'Chidinma Okeke',
+        age: 55,
+        gender: 'Female',
+        diagnosis: 'Ischemic stroke — left hemisphere',
+        riskLevel: 'moderate',
+        lastLog: '2026-02-21T08:00:00Z',
+        medications: ['Aspirin 75mg', 'Metoprolol 50mg'],
+        bloodPressure: '136/84',
+        heartRate: 74,
+        oxygenSat: 97,
+        healthStatus: 'Monitoring',
+        clinicalNotes: 'Language therapy ongoing. Speech improving. No new incidents.',
+        caretaker: { name: 'Obiora Okeke', relation: 'Husband', phone: '+234 809 012 3456' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0013-4b5e-8f9a-000000000013',
+        name: 'Peter Achebe',
+        age: 70,
+        gender: 'Male',
+        diagnosis: 'TIA — transient ischemic attack',
+        riskLevel: 'low',
+        lastLog: '2026-02-21T07:45:00Z',
+        medications: ['Aspirin 75mg', 'Rosuvastatin 5mg'],
+        bloodPressure: '130/82',
+        heartRate: 72,
+        oxygenSat: 98,
+        healthStatus: 'Stable',
+        clinicalNotes: 'Post-TIA, no further episodes. Diet and activity improvements noted.',
+        caretaker: null,
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0014-4b5e-8f9a-000000000014',
+        name: 'Hadiza Umar',
+        age: 58,
+        gender: 'Female',
+        diagnosis: 'Ischemic stroke — right hemisphere',
+        riskLevel: 'moderate',
+        lastLog: '2026-02-20T14:00:00Z',
+        medications: ['Warfarin 4mg', 'Amlodipine 5mg', 'Lisinopril 10mg'],
+        bloodPressure: '140/88',
+        heartRate: 78,
+        oxygenSat: 96,
+        healthStatus: 'Monitoring',
+        clinicalNotes: 'Right-sided weakness improving with physio. BP control moderate.',
+        caretaker: { name: 'Lawal Umar', relation: 'Son', phone: '+234 810 123 4567' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0015-4b5e-8f9a-000000000015',
+        name: 'Olumide Fashola',
+        age: 66,
+        gender: 'Male',
+        diagnosis: 'Lacunar stroke',
+        riskLevel: 'low',
+        lastLog: '2026-02-21T06:30:00Z',
+        medications: ['Aspirin 75mg', 'Simvastatin 40mg'],
+        bloodPressure: '122/78',
+        heartRate: 66,
+        oxygenSat: 98,
+        healthStatus: 'Stable',
+        clinicalNotes: 'Great recovery trajectory. Walking unsupported. Discharged to home monitoring.',
+        caretaker: { name: 'Bola Fashola', relation: 'Wife', phone: '+234 811 234 5678' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0016-4b5e-8f9a-000000000016',
+        name: 'Ifeoma Chukwu',
+        age: 52,
+        gender: 'Female',
+        diagnosis: 'Hemorrhagic stroke — intracerebral',
+        riskLevel: 'high',
+        lastLog: '2026-02-21T05:00:00Z',
+        medications: ['Labetalol 100mg', 'Mannitol 20%'],
+        bloodPressure: '175/110',
+        heartRate: 98,
+        oxygenSat: 92,
+        healthStatus: 'Critical',
+        clinicalNotes: 'Severe presentation. ICU discharge 4 days ago. Home monitoring initiated cautiously.',
+        caretaker: { name: 'Ikenna Chukwu', relation: 'Husband', phone: '+234 812 345 6789' },
+        caretakerMessages: [
+            makeMsg('m8', 'admin', 'Ifeoma BP is dangerously high. Please confirm she is resting and has taken meds.', '2026-02-21T05:30:00Z'),
+        ],
+        lastEscalation: '2026-02-21T05:30:00Z',
+    },
+    {
+        uuid: 'ae1f2c3d-0017-4b5e-8f9a-000000000017',
+        name: 'Abdullahi Yusuf',
+        age: 74,
+        gender: 'Male',
+        diagnosis: 'Ischemic stroke — MCA territory',
+        riskLevel: 'moderate',
+        lastLog: '2026-02-20T09:30:00Z',
+        medications: ['Aspirin 75mg', 'Atorvastatin 40mg', 'Ramipril 10mg'],
+        bloodPressure: '144/89',
+        heartRate: 80,
+        oxygenSat: 96,
+        healthStatus: 'Monitoring',
+        clinicalNotes: 'Stable but medication adherence inconsistent. Dietary counseling recommended.',
+        caretaker: null,
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0018-4b5e-8f9a-000000000018',
+        name: 'Stella Okonkwo',
+        age: 60,
+        gender: 'Female',
+        diagnosis: 'TIA — transient ischemic attack',
+        riskLevel: 'low',
+        lastLog: '2026-02-21T07:00:00Z',
+        medications: ['Aspirin 75mg', 'Simvastatin 10mg'],
+        bloodPressure: '124/78',
+        heartRate: 68,
+        oxygenSat: 99,
+        healthStatus: 'Stable',
+        clinicalNotes: 'Compliant patient. No further TIA episodes. Quarterly review scheduled.',
+        caretaker: { name: 'Chidi Okonkwo', relation: 'Son', phone: '+234 813 456 7890' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0019-4b5e-8f9a-000000000019',
+        name: 'Ibrahim Musa',
+        age: 79,
+        gender: 'Male',
+        diagnosis: 'Ischemic stroke — posterior fossa',
+        riskLevel: 'moderate',
+        lastLog: '2026-02-20T12:00:00Z',
+        medications: ['Clopidogrel 75mg', 'Lisinopril 5mg'],
+        bloodPressure: '148/92',
+        heartRate: 84,
+        oxygenSat: 95,
+        healthStatus: 'Monitoring',
+        clinicalNotes: 'Balance and coordination affected. Physiotherapy 3x weekly. Risk remains moderate.',
+        caretaker: { name: 'Zainab Musa', relation: 'Wife', phone: '+234 814 567 8901' },
+        caretakerMessages: [],
+    },
+    {
+        uuid: 'ae1f2c3d-0020-4b5e-8f9a-000000000020',
+        name: 'Chinyere Anozie',
+        age: 56,
+        gender: 'Female',
+        diagnosis: 'Ischemic stroke — left hemisphere',
+        riskLevel: 'low',
+        lastLog: '2026-02-21T08:30:00Z',
+        medications: ['Aspirin 75mg', 'Atorvastatin 20mg'],
+        bloodPressure: '120/76',
+        heartRate: 64,
+        oxygenSat: 99,
+        healthStatus: 'Stable',
+        clinicalNotes: 'Remarkable recovery. Returned to part-time work. Monthly monitoring only.',
+        caretaker: null,
+        caretakerMessages: [],
+    },
+]
+
+// In-memory mutation helpers
+export const getPatient = (uuid: string): Patient | undefined =>
+    patients.find((p) => p.uuid === uuid)
+
+export const updatePatient = (uuid: string, updates: Partial<Patient>): boolean => {
+    const idx = patients.findIndex((p) => p.uuid === uuid)
+    if (idx === -1) return false
+    patients[idx] = { ...patients[idx], ...updates }
+    return true
+}
+
+export const addCaretakerMessage = (
+    uuid: string,
+    from: 'admin' | 'caretaker',
+    text: string,
+): boolean => {
+    const patient = getPatient(uuid)
+    if (!patient) return false
+    patient.caretakerMessages.push({
+        id: `msg-${Date.now()}`,
+        from,
+        text,
+        timestamp: new Date().toISOString(),
+    })
+    return true
+}
