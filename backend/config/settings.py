@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Custom Apps
 CUSTOM_APPS = [
     'patients',
+    'medical',
     # 'accounts',
     # 'health_logs',
     # 'ai_risk_engine',
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular',
 ] + CUSTOM_APPS
 
 MIDDLEWARE = [
@@ -137,4 +139,5 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
