@@ -1,0 +1,38 @@
+aegis_ai_backend/
+├── manage.py
+├── core/                         # Project settings & configuration
+│   ├── settings.py               # Main config (DB, Redis, Celery)
+│   ├── urls.py                   # Root URL routing
+│   ├── celery.py                 # Celery app definition
+│   └── wsgi.py
+├── apps/
+│   ├── accounts/                 # ELDERLY, CAREGIVER roles & linking
+│   │   ├── models.py             # CustomUser, Profile, CaregiverLink
+│   │   ├── serializers.py
+│   │   └── views.py
+│   ├── health_logs/              # CRUD for all health biometrics
+│   │   ├── models.py             # MedicationLog, BPReading, etc.
+│   │   ├── serializers.py
+│   │   └── views.py              # Triggers AI tasks on save
+│   ├── ai_risk_engine/           # AI Engine 
+│   │   ├── services.py           # Logic for score + drivers
+│   │   ├── tasks.py              # Async scoring jobs
+│   │   └── models.py             # RiskScore, RiskDriver
+│   ├── ai_guidance_engine/       # AI Engine 
+│   │   ├── services.py           # Nudge/Recommendation logic
+│   │   ├── tasks.py              # Async plan generation
+│   │   └── models.py             # DailyPlan
+│   ├── ai_escalation_engine/     # AI Engine #3 (Triage & Alerting)
+│   │   ├── services.py           # Threshold & pattern logic
+│   │   ├── tasks.py              # Escalation checks
+│   │   └── models.py             # EscalationEvent
+│   ├── notifications/            # Communication delivery
+│   │   ├── models.py             # Alert status tracking
+│   │   └── providers/            # Email
+│   └── audit/                    # Compliance & Logs
+│       ├── models.py             # AuditEvent, DataAccessLog
+│       └── middleware.py         # Auto-log data access
+├── static/
+├── media/
+├── requirements.txt
+└── .env                          # API Keys & Secrets
