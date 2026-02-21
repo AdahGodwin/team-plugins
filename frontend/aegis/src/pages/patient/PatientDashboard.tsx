@@ -1,33 +1,33 @@
 import { useState } from 'react'
 import { MOCK_NOTIFICATIONS, MOCK_PATIENT } from '../../components/patient/data/mockData'
 
-import Sidebar            from '../../components/patient/layout/Sidebar'
-import MobileSidebar      from '../../components/patient/layout/MobileSidebar'
-import TopBar             from '../../components/patient/layout/TopBar'
-import BottomNav          from '../../components/patient/layout/BottomNav'
+import Sidebar from '../../components/patient/layout/Sidebar'
+import MobileSidebar from '../../components/patient/layout/MobileSidebar'
+import TopBar from '../../components/patient/layout/TopBar'
+import BottomNav from '../../components/patient/layout/BottomNav'
 
-import StatsRow           from '../../components/patient/dashboard/StatsRow'
-import RiskStatusCard     from '../../components/patient/dashboard/RiskStatusCard'
-import DailyLogCard       from '../../components/patient/dashboard/DailyLogCard'
-import ChatSection        from '../../components/patient/dashboard/ChatSesction'
-import SOSButton          from '../../components/patient/dashboard/SOSButton'
+import StatsRow from '../../components/patient/dashboard/StatsRow'
+import RiskStatusCard from '../../components/patient/dashboard/RiskStatusCard'
+import DailyLogCard from '../../components/patient/dashboard/DailyLogCard'
+import ChatSection from '../../components/patient/dashboard/ChatSection'
+import SOSButton from '../../components/patient/dashboard/SOSButton'
 import HealthReportButton from '../../components/patient/dashboard/HealthReportButton'
 import NotificationsPanel from '../../components/patient/dashboard/NotificationPanel'
 
 function PatientDashboard() {
-    const [sidebarOpen, setSidebarOpen] = useState(false)  
+    const [sidebarOpen, setSidebarOpen] = useState(false)
 
     const unreadCount = MOCK_NOTIFICATIONS.length
 
     return (
         <div className="min-h-screen bg-slate-50 flex">
 
-            <Sidebar unreadCount={unreadCount} />  
+            <Sidebar unreadCount={unreadCount} />
 
             {sidebarOpen && (
                 <MobileSidebar
                     onClose={() => setSidebarOpen(false)}
-                    unreadCount={unreadCount}          
+                    unreadCount={unreadCount}
                 />
             )}
 
@@ -38,7 +38,7 @@ function PatientDashboard() {
                     unreadCount={unreadCount}
                 />
 
-                <main className="flex-1 p-6 max-w-5xl mx-auto w-full space-y-6">
+                <main className="flex-1 p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-4 sm:space-y-6 overflow-x-hidden">
 
                     <StatsRow />
 
@@ -47,12 +47,12 @@ function PatientDashboard() {
                         reason={MOCK_PATIENT.riskReason}
                     />
 
-                    <div className="grid lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         <DailyLogCard />
                         <ChatSection />
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                         <SOSButton />
                         <HealthReportButton />
                         <NotificationsPanel />
@@ -68,7 +68,7 @@ function PatientDashboard() {
                 </main>
             </div>
 
-            <BottomNav unreadCount={unreadCount} /> 
+            <BottomNav unreadCount={unreadCount} />
         </div>
     )
 }

@@ -12,13 +12,13 @@ const NotificationsPanel = () => {
 
     return (
         <>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-50">
-                <div className="flex items-center justify-between mb-5">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm ring-1 ring-slate-50">
+                <div className="flex items-center justify-between mb-4 sm:mb-5">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-sm">
-                            <BellRing className="w-5 h-5" />
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0">
+                            <BellRing className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
-                        <h2 className="text-lg font-bold text-slate-900">Notifications</h2>
+                        <h2 className="text-base sm:text-lg font-bold text-slate-900">Notifications</h2>
                     </div>
                     {unread > 0 && (
                         <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-200">
@@ -29,8 +29,8 @@ const NotificationsPanel = () => {
 
                 <div className="space-y-3 mb-4">
                     {MOCK_NOTIFICATIONS.slice(0, 3).map(n => {
-                        const style   = NOTIFICATION_STYLES[n.type as keyof typeof NOTIFICATION_STYLES]
-                        const isRead  = read.includes(n.id)
+                        const style = NOTIFICATION_STYLES[n.type as keyof typeof NOTIFICATION_STYLES]
+                        const isRead = read.includes(n.id)
                         return (
                             <div key={n.id} className={`flex items-start gap-3 p-4 rounded-2xl border transition-all ${isRead ? 'bg-white border-slate-100 opacity-60' : `${style.bg} ${style.border}`}`}>
                                 <BellRing className={`w-4 h-4 mt-0.5 shrink-0 ${style.color}`} />
@@ -75,7 +75,7 @@ const NotificationsPanel = () => {
                         </div>
                         <div className="space-y-3">
                             {MOCK_NOTIFICATIONS.map(n => {
-                                const style  = NOTIFICATION_STYLES[n.type as keyof typeof NOTIFICATION_STYLES]
+                                const style = NOTIFICATION_STYLES[n.type as keyof typeof NOTIFICATION_STYLES]
                                 const isRead = read.includes(n.id)
                                 return (
                                     <div key={n.id} className={`flex items-start gap-3 p-4 rounded-2xl border transition-all ${isRead ? 'bg-white border-slate-100 opacity-60' : `${style.bg} ${style.border}`}`}>

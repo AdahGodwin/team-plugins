@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { MOCK_NOTIFICATIONS, MOCK_PATIENT, QUICK_PROMPTS, MOCK_CHAT_RESPONSES } from '../../components/patient/data/mockData'
-import Sidebar       from '../../components/patient/layout/Sidebar'
+import Sidebar from '../../components/patient/layout/Sidebar'
 import MobileSidebar from '../../components/patient/layout/MobileSidebar'
-import TopBar        from '../../components/patient/layout/TopBar'
-import BottomNav     from '../../components/patient/layout/BottomNav'
+import TopBar from '../../components/patient/layout/TopBar'
+import BottomNav from '../../components/patient/layout/BottomNav'
 import {
     Sparkles, Send, AlertTriangle, X,
     ShieldCheck, Heart, Apple, Pill,
@@ -16,48 +16,48 @@ const SYMPTOM_WORDS = ['dizzy', 'numb', 'weak', 'headache', 'vision', 'chest', '
 
 const TOPIC_CARDS = [
     {
-        icon: Heart,    color: 'from-rose-400 to-rose-500',
-        label: 'Blood Pressure',  prompt: 'Why is my risk elevated?',
-        sub:   'Understand your readings',
+        icon: Heart, color: 'from-rose-400 to-rose-500',
+        label: 'Blood Pressure', prompt: 'Why is my risk elevated?',
+        sub: 'Understand your readings',
     },
     {
-        icon: Apple,    color: 'from-teal-400 to-teal-500',
-        label: 'Nutrition',       prompt: 'What should I eat today?',
-        sub:   'DASH diet guidance',
+        icon: Apple, color: 'from-teal-400 to-teal-500',
+        label: 'Nutrition', prompt: 'What should I eat today?',
+        sub: 'DASH diet guidance',
     },
     {
-        icon: Pill,     color: 'from-blue-400 to-blue-500',
-        label: 'Medication',      prompt: 'Remind me about medication',
-        sub:   'Schedule & dosage',
+        icon: Pill, color: 'from-blue-400 to-blue-500',
+        label: 'Medication', prompt: 'Remind me about medication',
+        sub: 'Schedule & dosage',
     },
     {
         icon: ShieldCheck, color: 'from-amber-400 to-amber-500',
-        label: 'Risk Factors',    prompt: 'What are my stroke risk factors?',
-        sub:   'Know your risks',
+        label: 'Risk Factors', prompt: 'What are my stroke risk factors?',
+        sub: 'Know your risks',
     },
 ]
 
 const CHAT_HISTORY = [
-    { label: 'Yesterday',    preview: 'What foods help lower blood pressure?'   },
-    { label: 'Feb 19',       preview: 'Should I be worried about my dizziness?' },
-    { label: 'Feb 18',       preview: 'How much water should I drink daily?'    },
+    { label: 'Yesterday', preview: 'What foods help lower blood pressure?' },
+    { label: 'Feb 19', preview: 'Should I be worried about my dizziness?' },
+    { label: 'Feb 18', preview: 'How much water should I drink daily?' },
 ]
 
 const now = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 
 export default function PatientChat() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [messages,    setMessages]    = useState<Msg[]>([{
+    const [messages, setMessages] = useState<Msg[]>([{
         role: 'bot',
         text: `Hello ${MOCK_PATIENT.name}! I'm your Aegis AI health assistant. I can help with your blood pressure, medications, diet, and stroke risk. How are you feeling today?`,
         time: 'Just now',
     }])
-    const [input,       setInput]       = useState('')
+    const [input, setInput] = useState('')
     const [safetyAlert, setSafetyAlert] = useState(false)
-    const [isTyping,    setIsTyping]    = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
     const [showHistory, setShowHistory] = useState(false)
-    const bottomRef  = useRef<HTMLDivElement>(null)
-    const inputRef   = useRef<HTMLInputElement>(null)
+    const bottomRef = useRef<HTMLDivElement>(null)
+    const inputRef = useRef<HTMLInputElement>(null)
     const unreadCount = MOCK_NOTIFICATIONS.length
 
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, isTyping])
@@ -99,12 +99,12 @@ export default function PatientChat() {
             <div className="flex-1 lg:ml-64 flex flex-col min-h-screen pb-20 lg:pb-0">
                 <TopBar onMenuClick={() => setSidebarOpen(true)} unreadCount={unreadCount} />
 
-                <main className="flex-1 p-6 max-w-6xl mx-auto w-full">
+                <main className="flex-1 p-4 sm:p-6 max-w-6xl mx-auto w-full overflow-x-hidden">
 
                     {/* Header */}
-                    <div className="flex items-start justify-between mb-6">
+                    <div className="flex items-start justify-between flex-wrap gap-3 mb-4 sm:mb-6">
                         <div>
-                            <h1 className="text-2xl font-extrabold text-slate-900">AI Health Assistant</h1>
+                            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900">AI Health Assistant</h1>
                             <div className="flex items-center gap-2 mt-1">
                                 <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
                                 <p className="text-teal-600 text-sm font-medium">Online · Always available</p>
@@ -175,11 +175,10 @@ export default function PatientChat() {
                                                 </div>
                                             )}
                                             <div className="flex flex-col gap-1 max-w-[78%]">
-                                                <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${
-                                                    m.role === 'user'
+                                                <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${m.role === 'user'
                                                         ? 'bg-linear-to-br from-blue-500 to-teal-500 text-white rounded-br-sm'
                                                         : 'bg-slate-100 text-slate-700 rounded-bl-sm'
-                                                }`}>
+                                                    }`}>
                                                     {m.text}
                                                 </div>
                                                 <span className={`text-[10px] text-slate-400 px-1 ${m.role === 'user' ? 'text-right' : ''}`}>

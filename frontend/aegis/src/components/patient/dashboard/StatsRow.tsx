@@ -45,12 +45,12 @@ const StatsRow = () => (
                     <div className={`w-9 h-9 bg-linear-to-br ${color} rounded-xl flex items-center justify-center text-white shadow-sm`}>
                         <Icon className="w-4 h-4" />
                     </div>
-                    {trend === 'up'   && <TrendingUp   className="w-4 h-4 text-amber-500" />}
-                    {trend === 'down' && <TrendingDown className="w-4 h-4 text-rose-500"  />}
+                    {trend === 'up' && <TrendingUp className="w-4 h-4 text-amber-500" />}
+                    {trend === 'down' && <TrendingDown className="w-4 h-4 text-rose-500" />}
                 </div>
-                <p className="text-slate-900 font-extrabold text-lg leading-none mb-0.5">{value}</p>
-                <p className="text-slate-500 text-xs font-medium">{label}</p>
-                <p className="text-slate-400 text-xs">{sub}</p>
+                <p className="text-slate-900 font-extrabold text-base sm:text-lg leading-none mb-0.5 truncate">{value}</p>
+                <p className="text-slate-500 text-[10px] sm:text-xs font-medium truncate">{label}</p>
+                <p className="text-slate-400 text-[10px] sm:text-xs truncate">{sub}</p>
             </div>
         ))}
     </div>

@@ -9,13 +9,13 @@ const HealthReportButton = () => {
 
     return (
         <>
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm ring-1 ring-slate-50">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-sm">
-                        <Printer className="w-5 h-5" />
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm ring-1 ring-slate-50">
+                <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0">
+                        <Printer className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-slate-900">Health Report</h2>
+                    <div className="min-w-0">
+                        <h2 className="text-base sm:text-lg font-bold text-slate-900">Health Report</h2>
                         <p className="text-slate-400 text-xs">Last 7 days summary</p>
                     </div>
                 </div>
@@ -59,12 +59,12 @@ const HealthReportButton = () => {
 
                         <div className="space-y-3 mb-6">
                             {[
-                                { label: 'Current Risk Level',       value: cfg.label,                                                 valueClass: cfg.text         },
-                                { label: '7-Day Avg Blood Pressure', value: MOCK_PATIENT.bpAvg + ' mmHg',                             valueClass: 'text-slate-900' },
-                                { label: 'Medication Adherence',     value: `${MOCK_PATIENT.medicationAdherence}%`,                   valueClass: 'text-slate-900' },
-                                { label: 'Recent Symptoms',          value: MOCK_PATIENT.recentSymptoms.join(', ') || 'None reported', valueClass: 'text-slate-900' },
-                                { label: 'Last Log Submitted',       value: MOCK_PATIENT.lastLog,                                      valueClass: 'text-slate-900' },
-                                { label: 'Next Appointment',         value: MOCK_PATIENT.nextAppointment,                              valueClass: 'text-blue-600'  },
+                                { label: 'Current Risk Level', value: cfg.label, valueClass: cfg.text },
+                                { label: '7-Day Avg Blood Pressure', value: MOCK_PATIENT.bpAvg + ' mmHg', valueClass: 'text-slate-900' },
+                                { label: 'Medication Adherence', value: `${MOCK_PATIENT.medicationAdherence}%`, valueClass: 'text-slate-900' },
+                                { label: 'Recent Symptoms', value: MOCK_PATIENT.recentSymptoms.join(', ') || 'None reported', valueClass: 'text-slate-900' },
+                                { label: 'Last Log Submitted', value: MOCK_PATIENT.lastLog, valueClass: 'text-slate-900' },
+                                { label: 'Next Appointment', value: MOCK_PATIENT.nextAppointment, valueClass: 'text-blue-600' },
                             ].map(({ label, value, valueClass }) => (
                                 <div key={label} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
                                     <span className="text-slate-500 text-sm">{label}</span>

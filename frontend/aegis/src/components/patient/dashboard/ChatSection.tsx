@@ -7,14 +7,14 @@ const SYMPTOM_WORDS = ['dizzy', 'numb', 'weak', 'headache', 'vision', 'chest', '
 const now = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 
 const ChatSection = () => {
-    const [messages,    setMessages]    = useState<Msg[]>([{
+    const [messages, setMessages] = useState<Msg[]>([{
         role: 'bot',
         text: `Hello ${MOCK_PATIENT.name}! I'm your Aegis AI health assistant. How are you feeling today?`,
         time: 'Just now',
     }])
-    const [input,       setInput]       = useState('')
+    const [input, setInput] = useState('')
     const [safetyAlert, setSafetyAlert] = useState(false)
-    const [isTyping,    setIsTyping]    = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
     const bottomRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, isTyping])
@@ -40,15 +40,15 @@ const ChatSection = () => {
     return (
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm ring-1 ring-slate-50 flex flex-col">
             {/* Header */}
-            <div className="flex items-center gap-3 p-6 border-b border-slate-100">
+            <div className="flex items-center gap-3 p-4 sm:p-6 border-b border-slate-100">
                 <div className="relative">
-                    <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-sm">
-                        <Sparkles className="w-5 h-5" />
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-sm">
+                        <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-teal-500 rounded-full border-2 border-white" />
                 </div>
                 <div>
-                    <h2 className="text-lg font-bold text-slate-900">Ask Aegis AI</h2>
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900">Ask Aegis AI</h2>
                     <p className="text-teal-600 text-xs font-medium">Online · Always available</p>
                 </div>
             </div>
@@ -79,11 +79,10 @@ const ChatSection = () => {
                             </div>
                         )}
                         <div className="flex flex-col gap-1">
-                            <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${
-                                m.role === 'user'
-                                    ? 'bg-linear-to-br from-blue-500 to-teal-500 text-white rounded-br-sm'
-                                    : 'bg-slate-100 text-slate-700 rounded-bl-sm'
-                            }`}>
+                            <div className={`max-w-[90%] sm:max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${m.role === 'user'
+                                ? 'bg-linear-to-br from-blue-500 to-teal-500 text-white rounded-br-sm'
+                                : 'bg-slate-100 text-slate-700 rounded-bl-sm'
+                                }`}>
                                 {m.text}
                             </div>
                             <span className="text-[10px] text-slate-400 px-1">{m.time}</span>
@@ -106,12 +105,11 @@ const ChatSection = () => {
                 <div ref={bottomRef} />
             </div>
 
-            {/* Quick prompts */}
-            <div className="px-4 pb-3 flex flex-wrap gap-2">
+            <div className="px-4 pb-3 flex flex-wrap gap-2 overflow-x-hidden">
                 {QUICK_PROMPTS.map(p => (
                     <button
                         key={p} onClick={() => sendMessage(p)}
-                        className="text-xs font-medium bg-slate-50 border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition-all"
+                        className="text-[10px] sm:text-xs font-medium bg-slate-50 border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition-all whitespace-nowrap"
                     >
                         {p}
                     </button>

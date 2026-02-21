@@ -6,12 +6,12 @@ interface RiskStatusCardProps {
 }
 
 const RiskStatusCard = ({ risk, reason }: RiskStatusCardProps) => {
-    const cfg  = RISK_CONFIG[risk]
+    const cfg = RISK_CONFIG[risk]
     const Icon = cfg.icon
     const riskScore = risk === 'stable' ? 22 : risk === 'elevated' ? 58 : 87
 
     return (
-        <div className={`rounded-2xl border ${cfg.border} ${cfg.bg} p-6 shadow-sm`}>
+        <div className={`rounded-2xl border ${cfg.border} ${cfg.bg} p-4 sm:p-6 shadow-sm`}>
             <div className="flex flex-col sm:flex-row sm:items-start gap-5">
 
                 <div className="flex-1">

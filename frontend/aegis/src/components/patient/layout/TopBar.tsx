@@ -12,78 +12,78 @@ interface TopBarProps {
 type NotifType = 'alert' | 'medication' | 'vitals' | 'appointment' | 'system'
 
 interface QuickNotif {
-    id:    number
-    type:  NotifType
+    id: number
+    type: NotifType
     title: string
-    body:  string
-    time:  string
-    read:  boolean
+    body: string
+    time: string
+    read: boolean
 }
 
 const QUICK_NOTIFS: QuickNotif[] = [
     {
-        id:    1,
-        type:  'alert',
+        id: 1,
+        type: 'alert',
         title: 'High Blood Pressure Detected',
-        body:  'Your reading of 148/92 mmHg is above target.',
-        time:  '10 mins ago',
-        read:  false,
+        body: 'Your reading of 148/92 mmHg is above target.',
+        time: '10 mins ago',
+        read: false,
     },
     {
-        id:    2,
-        type:  'medication',
+        id: 2,
+        type: 'medication',
         title: 'Medication Reminder',
-        body:  'Time to take your Amlodipine 5mg.',
-        time:  '1 hour ago',
-        read:  false,
+        body: 'Time to take your Amlodipine 5mg.',
+        time: '1 hour ago',
+        read: false,
     },
     {
-        id:    3,
-        type:  'appointment',
+        id: 3,
+        type: 'appointment',
         title: 'Upcoming Appointment',
-        body:  'Dr Amara Osei · 5 March 2026 at 10:30 AM.',
-        time:  '3 hours ago',
-        read:  false,
+        body: 'Dr Amara Osei · 5 March 2026 at 10:30 AM.',
+        time: '3 hours ago',
+        read: false,
     },
     {
-        id:    4,
-        type:  'vitals',
+        id: 4,
+        type: 'vitals',
         title: 'Daily Log Reminder',
-        body:  "You haven't logged your vitals today.",
-        time:  'Yesterday',
-        read:  true,
+        body: "You haven't logged your vitals today.",
+        time: 'Yesterday',
+        read: true,
     },
     {
-        id:    5,
-        type:  'system',
+        id: 5,
+        type: 'system',
         title: 'Monthly Report Ready',
-        body:  'Your February 2026 summary is available.',
-        time:  'Yesterday',
-        read:  true,
+        body: 'Your February 2026 summary is available.',
+        time: 'Yesterday',
+        read: true,
     },
 ]
 
 const TYPE_CONFIG: Record<NotifType, {
-    icon:   React.ElementType<{ className?: string }>
+    icon: React.ElementType<{ className?: string }>
     iconBg: string
     iconFg: string
 }> = {
-    alert:       { icon: AlertTriangle, iconBg: 'bg-rose-100',    iconFg: 'text-rose-500'    },
-    medication:  { icon: Pill,          iconBg: 'bg-blue-100',    iconFg: 'text-blue-500'    },
-    vitals:      { icon: Activity,      iconBg: 'bg-teal-100',    iconFg: 'text-teal-500'    },
-    appointment: { icon: Calendar,      iconBg: 'bg-violet-100',  iconFg: 'text-violet-500'  },
-    system:      { icon: Info,          iconBg: 'bg-slate-100',   iconFg: 'text-slate-500'   },
+    alert: { icon: AlertTriangle, iconBg: 'bg-rose-100', iconFg: 'text-rose-500' },
+    medication: { icon: Pill, iconBg: 'bg-blue-100', iconFg: 'text-blue-500' },
+    vitals: { icon: Activity, iconBg: 'bg-teal-100', iconFg: 'text-teal-500' },
+    appointment: { icon: Calendar, iconBg: 'bg-violet-100', iconFg: 'text-violet-500' },
+    system: { icon: Info, iconBg: 'bg-slate-100', iconFg: 'text-slate-500' },
 }
 
 const TopBar = ({ onMenuClick }: TopBarProps) => {
-    const navigate                      = useNavigate()
-    const [open,         setOpen]        = useState(false)
-    const [notifs,       setNotifs]      = useState(QUICK_NOTIFS)
-    const dropdownRef                    = useRef<HTMLDivElement>(null)
+    const navigate = useNavigate()
+    const [open, setOpen] = useState(false)
+    const [notifs, setNotifs] = useState(QUICK_NOTIFS)
+    const dropdownRef = useRef<HTMLDivElement>(null)
 
-    const hour     = new Date().getHours()
+    const hour = new Date().getHours()
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-    const unread   = notifs.filter(n => !n.read).length
+    const unread = notifs.filter(n => !n.read).length
 
     // Close on outside click
     useEffect(() => {
@@ -96,51 +96,54 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
         return () => document.removeEventListener('mousedown', handler)
     }, [])
 
-    const markRead   = (id: number) =>
+    const markRead = (id: number) =>
         setNotifs(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
 
-    const dismiss    = (id: number) =>
+    const dismiss = (id: number) =>
         setNotifs(prev => prev.filter(n => n.id !== id))
 
     const markAllRead = () =>
         setNotifs(prev => prev.map(n => ({ ...n, read: true })))
 
     return (
-        <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+        <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-2 sticky top-0 z-30 shadow-sm">
 
-            {/* Left */}
-            <div className="flex items-center gap-3">
+            {/* Hamburger — mobile only, always first */}
+            <button
+                onClick={onMenuClick}
+                className="lg:hidden shrink-0 w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600"
+            >
+                <Menu className="w-5 h-5" />
+            </button>
+
+            {/* Greeting — takes remaining space, truncates */}
+            <div className="flex-1 min-w-0">
+                <h1 className="text-base sm:text-lg font-extrabold text-slate-900 truncate">
+                    {greeting}, {MOCK_PATIENT.name} 👋
+                </h1>
+                <p className="text-slate-400 text-xs hidden sm:block truncate">
+                    {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    {' · '}
+                    <span className="text-orange-500 font-semibold">
+                        🔥 {MOCK_PATIENT.streakDays}-day streak
+                    </span>
+                </p>
+            </div>
+
+            {/* AccessibilityBar — desktop only */}
+            <div className="hidden lg:flex">
                 <AccessibilityBar />
-                <button
-                    onClick={onMenuClick}
-                    className="lg:hidden w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600"
-                >
-                    <Menu className="w-5 h-5" />
-                </button>
-                <div>
-                    <h1 className="text-lg font-extrabold text-slate-900">
-                        {greeting}, {MOCK_PATIENT.name} 👋
-                    </h1>
-                    <p className="text-slate-400 text-xs hidden sm:block">
-                        {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
-                        {' · '}
-                        <span className="text-orange-500 font-semibold">
-                            🔥 {MOCK_PATIENT.streakDays}-day streak
-                        </span>
-                    </p>
-                </div>
             </div>
 
             {/* Right */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
 
                 {/* Bell + dropdown */}
                 <div ref={dropdownRef} className="relative">
                     <button
                         onClick={() => setOpen(o => !o)}
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${
-                            open ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        }`}
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${open ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                            }`}
                     >
                         <Bell className="w-4 h-4" />
                     </button>
@@ -152,9 +155,9 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         </span>
                     )}
 
-                    {/* Dropdown */}
+                    {/* Dropdown — constrained so it never overflows on xs */}
                     {open && (
-                        <div className="absolute right-0 top-12 w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50">
+                        <div className="absolute right-0 top-12 w-[calc(100vw-2rem)] max-w-80 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50">
 
                             {/* Header */}
                             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
@@ -185,15 +188,14 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                                     </div>
                                 ) : (
                                     notifs.map(n => {
-                                        const cfg  = TYPE_CONFIG[n.type]
+                                        const cfg = TYPE_CONFIG[n.type]
                                         const Icon = cfg.icon
                                         return (
                                             <div
                                                 key={n.id}
                                                 onClick={() => markRead(n.id)}
-                                                className={`flex items-start gap-3 px-4 py-3 cursor-pointer group transition-colors ${
-                                                    n.read ? 'hover:bg-slate-50' : 'bg-blue-50 hover:bg-blue-100/60'
-                                                }`}
+                                                className={`flex items-start gap-3 px-4 py-3 cursor-pointer group transition-colors ${n.read ? 'hover:bg-slate-50' : 'bg-blue-50 hover:bg-blue-100/60'
+                                                    }`}
                                             >
                                                 {/* Icon */}
                                                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${cfg.iconBg}`}>

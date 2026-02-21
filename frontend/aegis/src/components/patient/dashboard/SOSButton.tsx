@@ -3,9 +3,9 @@ import { Phone, AlertTriangle, CheckCircle2 } from 'lucide-react'
 
 const SOSButton = () => {
     const [showConfirm, setShowConfirm] = useState(false)
-    const [sent,        setSent]        = useState(false)
-    const [loading,     setLoading]     = useState(false)
-    const [countdown,   setCountdown]   = useState(5)
+    const [sent, setSent] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [countdown, setCountdown] = useState(5)
 
     useEffect(() => {
         if (!showConfirm || sent) return
@@ -23,14 +23,14 @@ const SOSButton = () => {
 
     return (
         <>
-            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white shadow-sm">
-                        <Phone className="w-5 h-5" />
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 sm:p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0">
+                        <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
-                    <div>
-                        <h2 className="text-lg font-bold text-slate-900">Emergency Alert</h2>
-                        <p className="text-slate-500 text-xs">Instantly alerts your caregiver & clinic</p>
+                    <div className="min-w-0">
+                        <h2 className="text-base sm:text-lg font-bold text-slate-900">Emergency Alert</h2>
+                        <p className="text-slate-500 text-xs">Instantly alerts your caregiver &amp; clinic</p>
                     </div>
                 </div>
 
