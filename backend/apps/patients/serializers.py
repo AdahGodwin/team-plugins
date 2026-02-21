@@ -29,11 +29,13 @@ class PatientRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'password', 'first_name', 'last_name', 'email', 
-                  'caregiver_email', 'date_of_birth', 'phone_number', 'address']
+                  'caregiver_email', 'caregiver_name', 'caregiver_phone', 'date_of_birth', 'phone_number', 'address']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         caregiver_email = validated_data.pop('caregiver_email')
+        caregiver_name = validated_data.pop('caregiver_name')
+        caregiver_phone = validated_data.pop('caregiver_phone')
         date_of_birth = validated_data.pop('date_of_birth')
         phone_number = validated_data.pop('phone_number')
         address = validated_data.pop('address')
@@ -48,6 +50,8 @@ class PatientRegistrationSerializer(serializers.ModelSerializer):
         Patient.objects.create(
             user=user,
             caregiver_email=caregiver_email,
+            caregiver_name=caregiver_name,
+            caregiver_phone=caregiver_phone,
             date_of_birth=date_of_birth,
             phone_number=phone_number,
             address=address
