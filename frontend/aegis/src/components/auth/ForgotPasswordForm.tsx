@@ -9,7 +9,7 @@ interface Props {
 export default function ForgotPasswordForm({ onGoLogin }: Props) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [sent, setSent] = useState(false);
+  const [sent, setSent]   = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,8 +24,11 @@ export default function ForgotPasswordForm({ onGoLogin }: Props) {
   if (sent) {
     return (
       <div className="flex flex-col items-center gap-6 rounded-2xl bg-white p-8 text-center shadow-xl ring-1 ring-slate-100 sm:rounded-3xl sm:p-10">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-teal-400 to-teal-600 shadow-lg">
-          <CheckCircle2 className="text-white" size={38} />
+        <div className="relative flex h-20 w-20 items-center justify-center">
+          <div className="absolute inset-0 animate-ping rounded-full bg-teal-100 opacity-60" />
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-teal-400 to-teal-600 shadow-lg">
+            <CheckCircle2 className="text-white" size={38} />
+          </div>
         </div>
         <div>
           <h2 className="text-xl font-extrabold text-slate-800 sm:text-2xl">Check your inbox</h2>
@@ -48,11 +51,10 @@ export default function ForgotPasswordForm({ onGoLogin }: Props) {
   return (
     <div className="rounded-2xl bg-white p-6 shadow-xl ring-1 ring-slate-100 sm:rounded-3xl sm:p-8">
 
-      {/* Heading */}
       <div className="mb-6 flex flex-col gap-2.5">
-        <div className="flex w-fit items-center gap-1.5 rounded-full border border-orange-100 bg-orange-50 px-3 py-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-orange-500">
+        <div className="flex w-fit items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1">
+          <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+          <span className="text-xs font-semibold uppercase tracking-widest text-blue-600">
             Account Recovery
           </span>
         </div>
@@ -81,7 +83,7 @@ export default function ForgotPasswordForm({ onGoLogin }: Props) {
 
         <button
           type="submit"
-          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-orange-400 to-rose-500 py-3.5 text-base font-bold text-white shadow-md transition-all hover:shadow-lg hover:opacity-95 active:scale-[0.98] sm:rounded-2xl sm:py-4"
+          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-blue-500 to-teal-500 py-3.5 text-base font-bold text-white shadow-md transition-all hover:shadow-lg hover:opacity-95 active:scale-[0.98] sm:rounded-2xl sm:py-4"
         >
           Send Reset Link
           <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />

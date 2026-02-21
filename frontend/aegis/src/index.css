@@ -15,3 +15,19 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.text-lg-mode {
+    font-size: 102.05%; 
+}
+
+.text-lg-mode p,
+.text-lg-mode span,
+.text-lg-mode button,
+.text-lg-mode label,
+.text-lg-mode input {
+    font-size: 1.05em;
+}
+
+.text-lg-mode h1 { font-size: 1.6rem;  }
+.text-lg-mode h2 { font-size: 1.35rem; }
+.text-lg-mode h3 { font-size: 1.15rem; }
