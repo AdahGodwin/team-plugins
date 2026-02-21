@@ -1,79 +1,108 @@
+import { ArrowRight, ShieldCheck } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
 const avatars = [
-    { color: '#60a5fa', initial: 'P' },
-    { color: '#a78bfa', initial: 'K' },
-    { color: '#34d399', initial: 'A' },
-    { color: '#f87171', initial: 'M' },
-    { color: '#fbbf24', initial: 'T' },
+    { color: 'from-blue-400 to-blue-500',  initial: 'P' },
+    { color: 'from-teal-400 to-teal-500',  initial: 'K' },
+    { color: 'from-cyan-400 to-cyan-500',  initial: 'A' },
+    { color: 'from-blue-500 to-teal-500',  initial: 'M' },
+    { color: 'from-teal-500 to-cyan-500',  initial: 'T' },
+]
+
+const images = [
+    { src: 'https://images.unsplash.com/photo-1559000357-f6b52ddfbe37?w=400&q=80', alt: 'Doctor reviewing patient data'       },
+    { src: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&q=80', alt: 'Patient using health monitoring app' },
+    { src: 'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=400&q=80', alt: 'Family member supporting recovery'   },
 ]
 
 const CTASection = () => {
     return (
-        <section className="relative bg-white py-24 overflow-hidden">
-            <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-blue-50 to-transparent" />
+        <section className="relative bg-slate-50 py-24 overflow-hidden">
+
+            {/* Background blobs — match Hero style */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                <div className="absolute -top-32 -right-32 w-125 h-125 bg-teal-100/50 rounded-full blur-3xl" />
+                <div className="absolute -bottom-32 -left-32 w-125 h-100 bg-blue-100/50 rounded-full blur-3xl" />
             </div>
 
             <div className="relative max-w-4xl mx-auto px-6 text-center">
-                {/* Image row */}
+
+                {/* Image row — match auth carousel card style */}
                 <div className="flex gap-3 mb-12 justify-center">
-                    {[
-                        { src: 'https://images.unsplash.com/photo-1559000357-f6b52ddfbe37?w=400&q=80', alt: 'Doctor reviewing patient data' },
-                        { src: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=400&q=80', alt: 'Patient using health monitoring app' },
-                        { src: 'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=400&q=80', alt: 'Family member supporting recovery' },
-                    ].map(({ src, alt }) => (
-                        <div key={alt} className="flex-1 rounded-2xl overflow-hidden h-40 shadow-md">
+                    {images.map(({ src, alt }, i) => (
+                        <div
+                            key={alt}
+                            className={`flex-1 rounded-2xl overflow-hidden shadow-md border border-slate-200 ring-1 ring-slate-100 h-40 ${
+                                i === 1 ? 'h-48 -mt-4' : ''
+                            }`}
+                        >
                             <img src={src} alt={alt} className="w-full h-full object-cover" />
                         </div>
                     ))}
                 </div>
+
+                {/* Section label — auth pill style */}
+                <div className="flex justify-center mb-6">
+                    <span className="inline-flex items-center gap-2 border border-blue-100 bg-blue-50 text-blue-600 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                        Get Started Today
+                    </span>
+                </div>
+
+                {/* Heading */}
                 <h2 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
                     Your Health Partner,{' '}
-                    <span className="bg-gradient-to-r from-blue-600 to-violet-600 bg-clip-text text-transparent">
+                    <span className="bg-linear-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">
                         Always On.
                     </span>
                 </h2>
 
-                <p className="text-slate-500 text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-slate-500 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
                     Join Aegis AI and take control of your stroke prevention and recovery journey — backed by continuous AI monitoring and intelligent care escalation.
                 </p>
 
-                {/* Auth CTAs */}
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-                    <a
-                        href="#"
-                        className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-violet-600 text-white font-semibold px-8 py-4 rounded-full hover:opacity-90 transition-all hover:scale-105 shadow-lg shadow-blue-500/25"
+                {/* CTAs — exact match to auth buttons */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-8">
+                    <Link
+                        to="/auth/register"
+                        className="group w-full sm:w-auto flex items-center justify-center gap-2 bg-linear-to-r from-blue-500 to-teal-500 text-white font-bold px-8 py-4 rounded-2xl hover:opacity-95 transition-all hover:shadow-lg shadow-md active:scale-[0.98]"
                     >
+                        <ShieldCheck className="w-5 h-5" />
                         Create an Account
-                    </a>
-                    <a
-                        href="#"
-                        className="w-full sm:w-auto border border-slate-200 text-slate-700 font-semibold px-8 py-4 rounded-full hover:border-blue-300 hover:text-blue-600 transition-all"
+                        <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                    </Link>
+                    <Link
+                        to="/auth"
+                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white border border-slate-200 text-slate-700 font-semibold px-8 py-4 rounded-2xl hover:border-slate-300 hover:bg-slate-50 transition-all shadow-sm"
                     >
                         Sign In
-                    </a>
+                    </Link>
                 </div>
 
-                <p className="text-slate-400 text-sm mb-12">
+                {/* Trust line — matches auth disclaimer style */}
+                <div className="flex items-center justify-center gap-2 text-slate-400 text-sm mb-12">
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400 inline-block" />
                     Free to start · HIPAA-compliant · No credit card required
-                </p>
+                </div>
 
-                {/* Social proof */}
-                <div className="flex flex-col items-center gap-3">
+                {/* Social proof — white card style */}
+                <div className="inline-flex flex-col items-center gap-4 bg-white border border-slate-200 rounded-2xl shadow-sm ring-1 ring-slate-100 px-8 py-5">
                     <div className="flex -space-x-3">
                         {avatars.map((avatar, i) => (
                             <div
                                 key={i}
-                                className="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold"
-                                style={{ backgroundColor: avatar.color }}
+                                className={`w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-white text-xs font-bold bg-linear-to-br ${avatar.color} shadow-sm`}
                             >
                                 {avatar.initial}
                             </div>
                         ))}
                     </div>
                     <p className="text-slate-500 text-sm">
-                        <span className="text-slate-900 font-semibold">500+ patients</span> already using Aegis AI
+                        <span className="text-slate-900 font-bold">500+ patients</span>{' '}
+                        already protected by Aegis AI
                     </p>
                 </div>
+
             </div>
         </section>
     )
