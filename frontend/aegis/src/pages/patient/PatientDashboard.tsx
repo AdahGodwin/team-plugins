@@ -20,7 +20,7 @@ function PatientDashboard() {
     const unreadCount = MOCK_NOTIFICATIONS.length
 
     return (
-        <div className="min-h-screen bg-slate-50 flex font-sans">
+        <div className="min-h-screen bg-slate-50 flex">
 
             <Sidebar unreadCount={unreadCount} />  
 
