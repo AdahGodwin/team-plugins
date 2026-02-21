@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Bell, Menu, AlertTriangle, Pill, Activity, Calendar, Info, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { MOCK_PATIENT } from '../data/mockData'
+import AccessibilityBar from '../../common/AccessibilityBar'
 
 interface TopBarProps {
     onMenuClick: () => void
@@ -109,6 +110,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
 
             {/* Left */}
             <div className="flex items-center gap-3">
+                <AccessibilityBar />
                 <button
                     onClick={onMenuClick}
                     className="lg:hidden w-9 h-9 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600"
