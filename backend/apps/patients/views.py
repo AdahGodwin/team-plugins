@@ -6,8 +6,9 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from .serializers import PatientRegistrationSerializer, PatientProfileSerializer
 
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
 class RegisterPatientAPIView(APIView):
-    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = PatientRegistrationSerializer(data=request.data)
@@ -21,8 +22,9 @@ class RegisterPatientAPIView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
 class LoginAPIView(APIView):
-    permission_classes = [AllowAny]
 
     def post(self, request):
         username = request.data.get('username')
@@ -38,8 +40,9 @@ class LoginAPIView(APIView):
             
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
+@api_view(['POST'])
+@permission_classes([permissions.ISAuthenticated])
 class PatientDashboardAPIView(APIView):
-    permission_classes = [IsAuthenticated] # Requires the token in the request header
 
     def get(self, request):
         # Fetch the patient profile linked to the logged-in user
