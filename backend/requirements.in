@@ -1,6 +1,8 @@
-# requirements.in
 django
 djangorestframework
 google-generativeai
 apscheduler
+dj-database-url
+whitenoise
+gunicorn
 python-dotenv
