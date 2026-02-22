@@ -8,11 +8,12 @@ import {
   Settings,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { MOCK_PATIENT, RISK_CONFIG } from "../data/mockData";
-import { useState } from "react";
+import { RISK_CONFIG } from "../data/mockData";
+import { useState, useEffect } from "react";
 import LogoutModal from "../../auth/modal/LogoutModal";
 import { useLanguage } from "../../../i18n/LanguageContext";
 import { useAuth } from "../../../context/AuthContext";
+import { fetchPatient } from "../../../api/patientService";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -60,9 +61,36 @@ const Sidebar = ({ unreadCount }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
-  const { logout } = useAuth();
-  const riskCfg = RISK_CONFIG[MOCK_PATIENT.riskLevel];
+  const { logout, profile } = useAuth();
+
+  const [patient, setPatient] = useState<any | null>(null);
   const [showLogout, setShowLogout] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const pid = profile?.patientId;
+    if (!pid) return;
+    void (async () => {
+      try {
+        const p = await fetchPatient(pid);
+        if (mounted) setPatient(p);
+      } catch {
+        // ignore — sidebar will show profile fallback
+      }
+    })();
+    return () => { mounted = false };
+  }, [profile?.patientId]);
+
+  const mapRisk = (rl?: string) => {
+    if (!rl) return 'stable';
+    if (rl === 'high') return 'high';
+    if (rl === 'moderate') return 'elevated';
+    if (rl === 'low') return 'stable';
+    return 'stable';
+  };
+
+  const displayedRisk = mapRisk(patient?.riskLevel ?? undefined);
+  const riskCfg = RISK_CONFIG[displayedRisk as keyof typeof RISK_CONFIG];
 
   return (
     <>
@@ -81,18 +109,16 @@ const Sidebar = ({ unreadCount }: SidebarProps) => {
         <div className="px-6 py-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold border-2 border-slate-100 shadow-sm">
-              {MOCK_PATIENT.name[0]}
+              { (patient?.firstName ?? profile?.fullName?.charAt(0) ?? 'P')[0] }
             </div>
             <div>
               <p className="text-slate-800 font-bold text-sm">
-                {MOCK_PATIENT.fullName}
+                {patient ? `${patient.firstName} ${patient.lastName}` : profile?.fullName ?? 'Patient'}
               </p>
               <div className="flex items-center gap-1.5">
                 <span className={`w-1.5 h-1.5 rounded-full ${riskCfg.dot}`} />
                 <p className={`text-xs font-medium ${riskCfg.text}`}>
-                  {MOCK_PATIENT.riskLevel === 'stable' ? t('dashboard.riskStableLabel') :
-                    MOCK_PATIENT.riskLevel === 'elevated' ? t('dashboard.riskElevatedLabel') :
-                      t('dashboard.riskHighLabel')}
+                  {displayedRisk === 'stable' ? t('dashboard.riskStableLabel') : displayedRisk === 'elevated' ? t('dashboard.riskElevatedLabel') : t('dashboard.riskHighLabel')}
                 </p>
               </div>
             </div>
@@ -136,7 +162,7 @@ const Sidebar = ({ unreadCount }: SidebarProps) => {
             <p className="text-emerald-700 text-xs font-bold">{t('nav.nextAppointment')}</p>
           </div>
           <p className="text-slate-600 text-xs leading-relaxed">
-            {MOCK_PATIENT.nextAppointment}
+            {patient?.nextAppointment ?? 'No upcoming appointments'}
           </p>
         </div>
 
