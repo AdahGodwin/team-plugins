@@ -13,8 +13,10 @@ import ChatSection from '../../components/patient/dashboard/ChatSection'
 import SOSButton from '../../components/patient/dashboard/SOSButton'
 import HealthReportButton from '../../components/patient/dashboard/HealthReportButton'
 import NotificationsPanel from '../../components/patient/dashboard/NotificationPanel'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 function PatientDashboard() {
+    const { t } = useLanguage()
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
     const unreadCount = MOCK_NOTIFICATIONS.length
@@ -61,7 +63,7 @@ function PatientDashboard() {
                     {/* Disclaimer */}
                     <div className="bg-slate-100 border border-slate-200 rounded-2xl px-6 py-4 text-center">
                         <p className="text-slate-500 text-xs leading-relaxed">
-                            ⚕️ <span className="font-semibold text-slate-600">Medical Disclaimer:</span> Aegis supports daily health monitoring and does not replace professional medical care. Always consult your doctor for medical decisions.
+                            ⚕️ <span className="font-semibold text-slate-600">Medical Disclaimer:</span> {t('dashboard.disclaimer')}
                         </p>
                     </div>
 

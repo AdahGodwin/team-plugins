@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 type RiskLevel = 'low' | 'moderate' | 'high'
 
@@ -20,12 +21,12 @@ interface RiskConfig {
 
 const riskConfig: Record<RiskLevel, RiskConfig> = {
     low: {
-        color: 'text-teal-600',
-        textColor: 'text-teal-500',
-        bg: 'bg-teal-50',
-        border: 'border-teal-200',
-        dotColor: 'bg-teal-500',
-        barColor: 'from-teal-400 to-teal-500',
+        color: 'text-emerald-600',
+        textColor: 'text-emerald-500',
+        bg: 'bg-emerald-50',
+        border: 'border-emerald-200',
+        dotColor: 'bg-emerald-500',
+        barColor: 'bg-emerald-500',
         barWidth: '28%',
         score: 28,
         scoreLabel: '28 / 100',
@@ -44,7 +45,7 @@ const riskConfig: Record<RiskLevel, RiskConfig> = {
         bg: 'bg-amber-50',
         border: 'border-amber-200',
         dotColor: 'bg-amber-500',
-        barColor: 'from-amber-400 to-orange-500',
+        barColor: 'bg-amber-500',
         barWidth: '62%',
         score: 62,
         scoreLabel: '62 / 100',
@@ -63,7 +64,7 @@ const riskConfig: Record<RiskLevel, RiskConfig> = {
         bg: 'bg-rose-50',
         border: 'border-rose-200',
         dotColor: 'bg-rose-500',
-        barColor: 'from-rose-400 to-rose-600',
+        barColor: 'bg-rose-500',
         barWidth: '89%',
         score: 89,
         scoreLabel: '89 / 100',
@@ -81,6 +82,7 @@ const riskConfig: Record<RiskLevel, RiskConfig> = {
 const riskLevels: RiskLevel[] = ['low', 'moderate', 'high']
 
 const RiskScore = () => {
+    const { t } = useLanguage()
     const [active, setActive] = useState<RiskLevel>('moderate')
     const config = riskConfig[active]
 
@@ -90,15 +92,15 @@ const RiskScore = () => {
 
                 {/* Section label — auth pill style */}
                 <div className="flex justify-center mb-6">
-                    <span className="inline-flex items-center gap-2 border border-blue-100 bg-blue-50 text-blue-600 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="inline-flex items-center gap-2 border border-emerald-100 bg-emerald-50 text-emerald-600 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         Dynamic Risk Intelligence
                     </span>
                 </div>
 
                 <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 text-center mb-4 tracking-tight">
                     Real-Time Relapse{' '}
-                    <span className="bg-linear-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">
+                    <span className="text-emerald-600">
                         Risk Score
                     </span>
                 </h2>
@@ -119,11 +121,10 @@ const RiskScore = () => {
                                     <button
                                         key={level}
                                         onClick={() => setActive(level)}
-                                        className={`w-full text-left rounded-xl p-4 border transition-all duration-200 cursor-pointer ${
-                                            isActive
-                                                ? `${cfg.bg} ${cfg.border} scale-[1.02] shadow-md`
-                                                : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
-                                        }`}
+                                        className={`w-full text-left rounded-xl p-4 border transition-all duration-200 cursor-pointer ${isActive
+                                            ? `${cfg.bg} ${cfg.border} scale-[1.02] shadow-md`
+                                            : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300'
+                                            }`}
                                     >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
@@ -152,13 +153,13 @@ const RiskScore = () => {
                             </div>
                             <div className="h-3 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                                 <div
-                                    className={`h-full rounded-full bg-linear-to-r ${config.barColor} transition-all duration-700`}
+                                    className={`h-full rounded-full ${config.barColor} transition-all duration-700`}
                                     style={{ width: config.barWidth }}
                                 />
                             </div>
                             <div className="flex justify-between text-xs text-slate-400 mt-1">
-                                <span>Safe</span>
-                                <span>Critical</span>
+                                <span>{t('dashboard.riskSafe' as any)}</span>
+                                <span>{t('dashboard.riskCritical' as any)}</span>
                             </div>
                         </div>
 
@@ -197,11 +198,10 @@ const RiskScore = () => {
                                 <button
                                     key={level}
                                     onClick={() => setActive(level)}
-                                    className={`text-center p-3 rounded-xl border text-xs font-semibold transition-all duration-200 ${
-                                        level === active
-                                            ? `${riskConfig[level].bg} ${riskConfig[level].border} ${riskConfig[level].color}`
-                                            : 'bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600'
-                                    }`}
+                                    className={`text-center p-3 rounded-xl border text-xs font-semibold transition-all duration-200 ${level === active
+                                        ? `${riskConfig[level].bg} ${riskConfig[level].border} ${riskConfig[level].color}`
+                                        : 'bg-slate-50 border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600'
+                                        }`}
                                 >
                                     {riskConfig[level].label}
                                 </button>

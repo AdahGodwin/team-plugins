@@ -3,6 +3,7 @@ import { Bell, Menu, AlertTriangle, Pill, Activity, Calendar, Info, X } from 'lu
 import { useNavigate } from 'react-router-dom'
 import { MOCK_PATIENT } from '../data/mockData'
 import AccessibilityBar from '../../common/AccessibilityBar'
+import { useLanguage } from '../../../i18n/LanguageContext'
 
 interface TopBarProps {
     onMenuClick: () => void
@@ -69,20 +70,23 @@ const TYPE_CONFIG: Record<NotifType, {
     iconFg: string
 }> = {
     alert: { icon: AlertTriangle, iconBg: 'bg-rose-100', iconFg: 'text-rose-500' },
-    medication: { icon: Pill, iconBg: 'bg-blue-100', iconFg: 'text-blue-500' },
-    vitals: { icon: Activity, iconBg: 'bg-teal-100', iconFg: 'text-teal-500' },
-    appointment: { icon: Calendar, iconBg: 'bg-violet-100', iconFg: 'text-violet-500' },
+    medication: { icon: Pill, iconBg: 'bg-emerald-100', iconFg: 'text-emerald-500' },
+    vitals: { icon: Activity, iconBg: 'bg-emerald-100', iconFg: 'text-emerald-500' },
+    appointment: { icon: Calendar, iconBg: 'bg-slate-100', iconFg: 'text-slate-500' },
     system: { icon: Info, iconBg: 'bg-slate-100', iconFg: 'text-slate-500' },
 }
 
 const TopBar = ({ onMenuClick }: TopBarProps) => {
     const navigate = useNavigate()
+    const { t, locale } = useLanguage()
     const [open, setOpen] = useState(false)
     const [notifs, setNotifs] = useState(QUICK_NOTIFS)
     const dropdownRef = useRef<HTMLDivElement>(null)
 
     const hour = new Date().getHours()
-    const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+    const greetingKey = hour < 12 ? 'dashboard.greeting' : hour < 17 ? 'dashboard.greetingAfternoon' : 'dashboard.greetingEvening'
+    const greeting = t(greetingKey as any)
+
     const unread = notifs.filter(n => !n.read).length
 
     // Close on outside click
@@ -122,10 +126,10 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                     {greeting}, {MOCK_PATIENT.name} 👋
                 </h1>
                 <p className="text-slate-400 text-xs hidden sm:block truncate">
-                    {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                    {new Date().toLocaleDateString(locale === 'en' ? 'en-GB' : locale, { weekday: 'long', day: 'numeric', month: 'long' })}
                     {' · '}
-                    <span className="text-orange-500 font-semibold">
-                        🔥 {MOCK_PATIENT.streakDays}-day streak
+                    <span className="text-emerald-600 font-semibold">
+                        🔥 {t('dashboard.streakMessage' as any, MOCK_PATIENT.streakDays)}
                     </span>
                 </p>
             </div>
@@ -142,7 +146,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 <div ref={dropdownRef} className="relative">
                     <button
                         onClick={() => setOpen(o => !o)}
-                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${open ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${open ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                             }`}
                     >
                         <Bell className="w-4 h-4" />
@@ -162,7 +166,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                             {/* Header */}
                             <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
                                 <div className="flex items-center gap-2">
-                                    <p className="text-slate-800 font-bold text-sm">Notifications</p>
+                                    <p className="text-slate-800 font-bold text-sm">{t('dashboard.notifications.title' as any)}</p>
                                     {unread > 0 && (
                                         <span className="bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                                             {unread}
@@ -172,9 +176,9 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                                 {unread > 0 && (
                                     <button
                                         onClick={markAllRead}
-                                        className="text-[11px] font-semibold text-teal-600 hover:text-teal-700 transition-colors"
+                                        className="text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
                                     >
-                                        Mark all read
+                                        {t('dashboard.notifications.markAllRead' as any)}
                                     </button>
                                 )}
                             </div>
@@ -184,7 +188,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                                 {notifs.length === 0 ? (
                                     <div className="px-4 py-8 flex flex-col items-center gap-2">
                                         <Bell className="w-6 h-6 text-slate-300" />
-                                        <p className="text-slate-400 text-sm font-medium">All caught up!</p>
+                                        <p className="text-slate-400 text-sm font-medium">{t('dashboard.notifications.caughtUp' as any)}</p>
                                     </div>
                                 ) : (
                                     notifs.map(n => {
@@ -194,7 +198,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                                             <div
                                                 key={n.id}
                                                 onClick={() => markRead(n.id)}
-                                                className={`flex items-start gap-3 px-4 py-3 cursor-pointer group transition-colors ${n.read ? 'hover:bg-slate-50' : 'bg-blue-50 hover:bg-blue-100/60'
+                                                className={`flex items-start gap-3 px-4 py-3 cursor-pointer group transition-colors ${n.read ? 'hover:bg-slate-50' : 'bg-emerald-50 hover:bg-emerald-100/60'
                                                     }`}
                                             >
                                                 {/* Icon */}
@@ -206,7 +210,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-1.5">
                                                         {!n.read && (
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 shrink-0" />
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
                                                         )}
                                                         <p className={`text-xs font-bold truncate ${n.read ? 'text-slate-600' : 'text-slate-900'}`}>
                                                             {n.title}
@@ -234,10 +238,10 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                             {/* Footer */}
                             <div className="px-4 py-3 border-t border-slate-100">
                                 <button
-                                    onClick={() => { setOpen(false); navigate('/patient/notifications') }}
-                                    className="w-full py-2.5 rounded-xl bg-linear-to-r from-blue-500 to-teal-500 text-white text-xs font-bold hover:opacity-90 transition-opacity shadow-sm"
+                                    onClick={() => { setOpen(false); navigate('/dashboard/notifications') }}
+                                    className="w-full py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-shadow shadow-sm"
                                 >
-                                    View all notifications
+                                    {t('dashboard.notifications.viewAll' as any)}
                                 </button>
                             </div>
 
@@ -246,7 +250,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 </div>
 
                 {/* Avatar */}
-                <div className="w-9 h-9 rounded-xl bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
                     {MOCK_PATIENT.name[0]}
                 </div>
             </div>

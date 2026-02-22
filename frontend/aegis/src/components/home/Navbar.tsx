@@ -17,7 +17,7 @@ const Navbar = () => {
             <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
 
                 <Link to="/" className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center shadow-sm">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
                         <ShieldCheck className="w-4 h-4 text-white" />
                     </div>
                     <span className="font-extrabold text-base text-slate-800 tracking-tight">
@@ -46,7 +46,7 @@ const Navbar = () => {
                     </Link>
                     <Link
                         to="/auth/register"
-                        className="text-sm font-bold bg-linear-to-r from-blue-500 to-teal-500 text-white px-5 py-2.5 rounded-xl hover:opacity-90 transition-all hover:shadow-md shadow-sm active:scale-[0.98]"
+                        className="text-sm font-bold bg-emerald-600 text-white px-5 py-2.5 rounded-xl hover:bg-emerald-700 transition-all hover:shadow-md shadow-sm active:scale-[0.98]"
                     >
                         Get Started
                     </Link>
@@ -83,7 +83,7 @@ const Navbar = () => {
                     </Link>
                     <Link
                         to="/auth/register"
-                        className="text-sm font-bold bg-linear-to-r from-blue-500 to-teal-500 text-white px-4 py-3 rounded-xl text-center hover:opacity-90 transition-all"
+                        className="text-sm font-bold bg-emerald-600 text-white px-4 py-3 rounded-xl text-center hover:bg-emerald-700 transition-all"
                         onClick={() => setMobileOpen(false)}
                     >
                         Get Started

@@ -13,7 +13,7 @@ export default function AdminSelectField({ label, options, className = '', ...se
             </label>
             <select
                 {...selectProps}
-                className={`w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+                className={`w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
             >
                 {options.map((option) => (
                     <option key={option.value} value={option.value}>

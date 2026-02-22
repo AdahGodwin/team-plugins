@@ -4,6 +4,7 @@ import LoginForm from "../../components/auth/LoginForm";
 import RegisterForm from "../../components/auth/RegisterForm";
 import ForgotPasswordForm from "../../components/auth/ForgotPasswordForm";
 import CarouselPanel from "../../components/auth/CarouselPanel";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 export type AuthView = "login" | "register" | "forgot";
 
@@ -12,6 +13,7 @@ interface AuthPageProps {
 }
 
 export default function AuthPage({ view: initialView = "login" }: AuthPageProps) {
+  const { t } = useLanguage();
   const [view, setView] = useState<AuthView>(initialView);
   const [animating, setAnimating] = useState(false);
 
@@ -34,17 +36,16 @@ export default function AuthPage({ view: initialView = "login" }: AuthPageProps)
       <div className="ml-auto flex min-h-screen w-full flex-col bg-slate-100 lg:w-[48%] xl:w-[45%]">
 
         <div className="flex items-center gap-2 border-b border-slate-200 bg-white px-5 py-4 lg:hidden">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-teal-500">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500">
             <ShieldCheck className="text-white" size={16} />
           </div>
-          <span className="text-base font-extrabold text-slate-800">Aegis</span>
+          <span className="text-base font-extrabold text-slate-800">{t('common.brand' as any)}</span>
         </div>
 
         <div className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
           <div className="w-full max-w-lg">
-            <div className={`transition-all duration-200 ${
-              animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
-            }`}>
+            <div className={`transition-all duration-200 ${animating ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+              }`}>
               {view === "login" && (
                 <LoginForm
                   onGoRegister={() => switchView("register")}

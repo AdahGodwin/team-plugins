@@ -19,7 +19,7 @@ export default function PatientHeaderCard({
     return (
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col sm:flex-row sm:items-center gap-4">
             {/* Avatar */}
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-extrabold text-xl shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-600 flex items-center justify-center text-white font-extrabold text-xl shrink-0">
                 {patient.name[0]}
             </div>
 
@@ -39,8 +39,8 @@ export default function PatientHeaderCard({
                 {showProfileLink && (
                     <div className="mt-1">
                         <Link
-                            to={`/admin/patients/${patient.uuid}`}
-                            className="text-xs text-blue-600 font-semibold hover:underline flex items-center gap-1 w-fit"
+                            to={`/portal/patients/${patient.uuid}`}
+                            className="text-xs text-emerald-600 font-semibold hover:underline flex items-center gap-1 w-fit"
                         >
                             View Full Profile <ArrowRight className="w-3.5 h-3.5" />
                         </Link>

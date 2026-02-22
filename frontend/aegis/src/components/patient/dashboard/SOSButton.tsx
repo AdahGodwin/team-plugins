@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Phone, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { useLanguage } from '../../../i18n/LanguageContext'
 
 const SOSButton = () => {
+    const { t } = useLanguage()
     const [showConfirm, setShowConfirm] = useState(false)
     const [sent, setSent] = useState(false)
     const [loading, setLoading] = useState(false)
@@ -29,22 +31,22 @@ const SOSButton = () => {
                         <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
                     <div className="min-w-0">
-                        <h2 className="text-base sm:text-lg font-bold text-slate-900">Emergency Alert</h2>
-                        <p className="text-slate-500 text-xs">Instantly alerts your caregiver &amp; clinic</p>
+                        <h2 className="text-base sm:text-lg font-bold text-slate-900">{t('dashboard.sos.alertTitle')}</h2>
+                        <p className="text-slate-500 text-xs">{t('dashboard.sos.alertSubtitle')}</p>
                     </div>
                 </div>
 
                 {sent ? (
                     <div className="space-y-3">
-                        <div className="flex items-start gap-3 bg-white border border-teal-200 rounded-2xl p-4">
-                            <CheckCircle2 className="w-6 h-6 text-teal-500 shrink-0 mt-0.5" />
+                        <div className="flex items-start gap-3 bg-white border border-emerald-200 rounded-2xl p-4">
+                            <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0 mt-0.5" />
                             <div>
-                                <p className="text-slate-900 font-bold text-sm">Alert sent successfully.</p>
-                                <p className="text-slate-500 text-xs mt-0.5">Sarah & Dr. Okafor's clinic have been notified.</p>
+                                <p className="text-slate-900 font-bold text-sm">{t('dashboard.sos.sentTitle')}</p>
+                                <p className="text-slate-500 text-xs mt-0.5">{t('dashboard.sos.sentSubtitle')}</p>
                             </div>
                         </div>
                         <button onClick={() => setSent(false)} className="w-full text-xs text-rose-500 font-semibold py-2 hover:underline">
-                            Reset (testing only)
+                            {t('dashboard.sos.reset')}
                         </button>
                     </div>
                 ) : (
@@ -53,7 +55,7 @@ const SOSButton = () => {
                         className="w-full flex flex-col bg-rose-500 hover:bg-rose-600 active:scale-[0.98] text-white font-extrabold text-[15px] py-5 rounded-2xl transition-all shadow-lg items-center justify-center gap-3 ring-4 ring-rose-200"
                     >
                         <AlertTriangle className="w-10 h-10" />
-                        EMERGENCY — Send Alert
+                        {t('dashboard.sos.emergencyButton')}
                     </button>
                 )}
             </div>
@@ -70,12 +72,12 @@ const SOSButton = () => {
                                 </span>
                             )}
                         </div>
-                        <h3 className="text-xl font-extrabold text-slate-900 text-center mb-2">Send Emergency Alert?</h3>
+                        <h3 className="text-xl font-extrabold text-slate-900 text-center mb-2">{t('dashboard.sos.confirmTitle')}</h3>
                         <p className="text-slate-500 text-sm text-center leading-relaxed mb-2">
-                            This will immediately notify <strong>Sarah</strong> and <strong>Dr. Okafor's clinic</strong>.
+                            {t('dashboard.sos.confirmSubtitle')}
                         </p>
                         <p className="text-rose-500 text-xs text-center font-medium mb-7">
-                            Auto-sending in {countdown}s unless cancelled
+                            {t('dashboard.sos.autoSend').replace('{seconds}', countdown.toString())}
                         </p>
                         <div className="flex flex-col gap-3">
                             <button
@@ -84,14 +86,14 @@ const SOSButton = () => {
                             >
                                 {loading
                                     ? <span className="w-5 h-5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                                    : <><AlertTriangle className="w-5 h-5" /> Send Now</>
+                                    : <><AlertTriangle className="w-5 h-5" /> {t('dashboard.sos.sendNow')}</>
                                 }
                             </button>
                             <button
                                 onClick={() => { setShowConfirm(false); setCountdown(5) }}
                                 className="w-full bg-white border border-slate-200 text-slate-600 font-semibold py-4 rounded-2xl hover:bg-slate-50 transition-all"
                             >
-                                Cancel
+                                {t('dashboard.sos.cancel')}
                             </button>
                         </div>
                     </div>

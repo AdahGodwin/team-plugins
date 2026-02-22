@@ -1,22 +1,22 @@
 import { useState } from 'react'
 import { MOCK_NOTIFICATIONS, MOCK_PATIENT } from '../../components/patient/data/mockData'
-import Sidebar        from '../../components/patient/layout/Sidebar'
-import MobileSidebar  from '../../components/patient/layout/MobileSidebar'
-import TopBar         from '../../components/patient/layout/TopBar'
-import BottomNav      from '../../components/patient/layout/BottomNav'
-import DailyLogCard   from '../../components/patient/dashboard/DailyLogCard'
-import BPTrendChart   from '../../components/patient/log/BPTrendChart'
-import PastLogsTab    from '../../components/patient/log/PastLogsTab'
+import Sidebar from '../../components/patient/layout/Sidebar'
+import MobileSidebar from '../../components/patient/layout/MobileSidebar'
+import TopBar from '../../components/patient/layout/TopBar'
+import BottomNav from '../../components/patient/layout/BottomNav'
+import DailyLogCard from '../../components/patient/dashboard/DailyLogCard'
+import BPTrendChart from '../../components/patient/log/BPTrendChart'
+import PastLogsTab from '../../components/patient/log/PastLogsTab'
 import DailyHabitsTab from '../../components/patient/log/DailyHabitsTab'
 import { Activity, Clock, CheckCircle2, Flame } from 'lucide-react'
 
 export default function PatientLog() {
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [activeTab,   setActiveTab]   = useState<'log' | 'history' | 'habits'>('log')
+    const [activeTab, setActiveTab] = useState<'log' | 'history' | 'habits'>('log')
     const unreadCount = MOCK_NOTIFICATIONS.length
 
     return (
-        <div className="min-h-screen bg-slate-50 flex font-sans">
+        <div className="min-h-screen bg-slate-50 flex  ">
             <Sidebar unreadCount={unreadCount} />
             {sidebarOpen && (
                 <MobileSidebar onClose={() => setSidebarOpen(false)} unreadCount={unreadCount} />
@@ -25,7 +25,7 @@ export default function PatientLog() {
             <div className="flex-1 lg:ml-64 flex flex-col min-h-screen pb-20 lg:pb-0">
                 <TopBar onMenuClick={() => setSidebarOpen(true)} unreadCount={unreadCount} />
 
-                <main className="flex-1 p-4 sm:p-6 max-w-250 mx-auto w-full space-y-4 sm:space-y-6">
+                <main className="flex-1 p-4 sm:p-6 max-w-5xl mx-auto w-full space-y-4 sm:space-y-6">
 
                     {/* Header */}
                     <div className="flex items-start justify-between gap-3">
@@ -51,18 +51,17 @@ export default function PatientLog() {
                     {/* Tab switcher */}
                     <div className="flex gap-1 bg-white border border-slate-200 rounded-2xl p-1.5 shadow-sm">
                         {([
-                            { id: 'log',     label: "Today's Log",  icon: Activity     },
-                            { id: 'history', label: 'Past Logs',    icon: Clock        },
-                            { id: 'habits',  label: 'Daily Habits', icon: CheckCircle2 },
+                            { id: 'log', label: "Today's Log", icon: Activity },
+                            { id: 'history', label: 'Past Logs', icon: Clock },
+                            { id: 'habits', label: 'Daily Habits', icon: CheckCircle2 },
                         ] as const).map(({ id, label, icon: Icon }) => (
                             <button
                                 key={id}
                                 onClick={() => setActiveTab(id)}
-                                className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                                    activeTab === id
-                                        ? 'bg-linear-to-r from-blue-500 to-teal-500 text-white shadow-sm'
-                                        : 'text-slate-500 hover:bg-slate-50'
-                                }`}
+                                className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${activeTab === id
+                                    ? 'bg-emerald-600 text-white shadow-sm'
+                                    : 'text-slate-500 hover:bg-slate-50'
+                                    }`}
                             >
                                 <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                                 <span className="hidden sm:inline">{label}</span>
@@ -74,9 +73,9 @@ export default function PatientLog() {
                     </div>
 
                     {/* Tab content */}
-                    {activeTab === 'log'     && <DailyLogCard   />}
-                    {activeTab === 'history' && <PastLogsTab    />}
-                    {activeTab === 'habits'  && <DailyHabitsTab />}
+                    {activeTab === 'log' && <DailyLogCard />}
+                    {activeTab === 'history' && <PastLogsTab />}
+                    {activeTab === 'habits' && <DailyHabitsTab />}
 
                 </main>
             </div>

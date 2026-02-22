@@ -40,15 +40,15 @@ const Features = () => {
 
                 {/* Section label — auth pill style */}
                 <div className="flex justify-center mb-6">
-                    <span className="inline-flex items-center gap-2 border border-blue-100 bg-blue-50 text-blue-600 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="inline-flex items-center gap-2 border border-emerald-100 bg-emerald-50 text-emerald-600 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         Platform Capabilities
                     </span>
                 </div>
 
                 <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 text-center mb-4 tracking-tight">
                     Built for{' '}
-                    <span className="bg-linear-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">
+                    <span className="text-emerald-600">
                         Life After Discharge
                     </span>
                 </h2>
@@ -60,9 +60,9 @@ const Features = () => {
                     {features.map((feature) => (
                         <div
                             key={feature.title}
-                            className="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-teal-200 hover:bg-teal-50/30 hover:shadow-md transition-all shadow-sm ring-1 ring-slate-50"
+                            className="group bg-white border border-slate-200 rounded-2xl p-6 hover:border-emerald-200 hover:bg-emerald-50/30 hover:shadow-md transition-all shadow-sm ring-1 ring-slate-50"
                         >
-                            <div className="w-11 h-11 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white mb-5 shadow-sm group-hover:scale-105 transition-transform">
+                            <div className="w-11 h-11 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 mb-5 shadow-sm group-hover:scale-105 transition-transform">
                                 {feature.icon}
                             </div>
                             <h3 className="text-slate-900 font-bold text-base mb-2">{feature.title}</h3>

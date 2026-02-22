@@ -1,16 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
 import { Sparkles, Send, AlertTriangle, X } from 'lucide-react'
 import { QUICK_PROMPTS, MOCK_CHAT_RESPONSES, MOCK_PATIENT } from '../data/mockData'
+import { useLanguage } from '../../../i18n/LanguageContext'
 
 type Msg = { role: 'user' | 'bot'; text: string; time: string }
 const SYMPTOM_WORDS = ['dizzy', 'numb', 'weak', 'headache', 'vision', 'chest', 'pain', 'speech', 'fall']
 const now = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 
 const ChatSection = () => {
+    const { t } = useLanguage()
     const [messages, setMessages] = useState<Msg[]>([{
         role: 'bot',
-        text: `Hello ${MOCK_PATIENT.name}! I'm your Aegis AI health assistant. How are you feeling today?`,
-        time: 'Just now',
+        text: t('chat.greeting', MOCK_PATIENT.name),
+        time: t('common.online') === 'Online' ? 'Just now' : t('common.online') === 'Yana kan layi' ? 'Yanzu nan' : t('common.online') === 'Nọ n\'ịntanetị' ? 'Ugbua' : 'Ní báyìí',
     }])
     const [input, setInput] = useState('')
     const [safetyAlert, setSafetyAlert] = useState(false)
@@ -31,8 +33,7 @@ const ChatSection = () => {
 
         setTimeout(() => {
             setIsTyping(false)
-            const reply = MOCK_CHAT_RESPONSES[msg.toLowerCase()] ??
-                'Thank you for your message. Based on your health history, I recommend speaking with your care team. Is there anything else I can help with?'
+            const reply = MOCK_CHAT_RESPONSES[msg.toLowerCase()] ?? t('chat.genericResponse')
             setMessages(prev => [...prev, { role: 'bot', text: reply, time: now() }])
         }, 1200)
     }
@@ -42,14 +43,14 @@ const ChatSection = () => {
             {/* Header */}
             <div className="flex items-center gap-3 p-4 sm:p-6 border-b border-slate-100">
                 <div className="relative">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-sm">
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-sm">
                         <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
                     </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-teal-500 rounded-full border-2 border-white" />
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
                 </div>
                 <div>
-                    <h2 className="text-base sm:text-lg font-bold text-slate-900">Ask Aegis AI</h2>
-                    <p className="text-teal-600 text-xs font-medium">Online · Always available</p>
+                    <h2 className="text-base sm:text-lg font-bold text-slate-900">{t('chat.title')}</h2>
+                    <p className="text-emerald-600 text-xs font-medium">{t('chat.online')}</p>
                 </div>
             </div>
 
@@ -58,9 +59,12 @@ const ChatSection = () => {
                 <div className="mx-4 mt-4 flex items-start gap-3 bg-rose-50 border border-rose-200 rounded-2xl p-4">
                     <AlertTriangle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
                     <div className="flex-1">
-                        <p className="text-rose-700 text-sm font-bold mb-0.5">Symptom Detected</p>
+                        <p className="text-rose-700 text-sm font-bold mb-0.5">{t('common.emergency')}</p>
                         <p className="text-rose-600 text-xs leading-relaxed">
-                            If this is a medical emergency, use the <strong>Emergency SOS button</strong> or call services immediately.
+                            {t('nav.dashboard') === 'Dashboard' ? "If this is a medical emergency, use the Emergency SOS button or call services immediately."
+                                : t('nav.dashboard') === 'Allon Lafiya' ? "Idan wannan gaggawar likita ce, yi amfani da maballin Emergency SOS ko kira sabis nan da nan."
+                                    : t('nav.dashboard') === 'Ihe ngosipụta Ahụike' ? "Ọ bụrụ na nke a bụ ihe mberede ahụike, jiri bọtịnụ Sos ma ọ bụ kpọọ ọrụ mberede ozugbo."
+                                        : "Bí èyí bá jẹ́ pàjáwìrì ìṣègùn, lo bọ́tìnì SOS pàjáwìrì tàbí pe àwọn iṣẹ́ ìrànlọ́wọ́ lẹ́sẹ̀kẹsẹ̀."}
                         </p>
                     </div>
                     <button onClick={() => setSafetyAlert(false)} className="text-rose-400 hover:text-rose-600 shrink-0">
@@ -74,13 +78,13 @@ const ChatSection = () => {
                 {messages.map((m, i) => (
                     <div key={i} className={`flex gap-2 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {m.role === 'bot' && (
-                            <div className="w-7 h-7 rounded-lg bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm">
+                            <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center text-white shrink-0 mt-0.5 shadow-sm">
                                 <Sparkles className="w-3.5 h-3.5" />
                             </div>
                         )}
                         <div className="flex flex-col gap-1">
                             <div className={`max-w-[90%] sm:max-w-[80%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-line ${m.role === 'user'
-                                ? 'bg-linear-to-br from-blue-500 to-teal-500 text-white rounded-br-sm'
+                                ? 'bg-emerald-600 text-white rounded-br-sm'
                                 : 'bg-slate-100 text-slate-700 rounded-bl-sm'
                                 }`}>
                                 {m.text}
@@ -92,7 +96,7 @@ const ChatSection = () => {
                 {/* Typing indicator */}
                 {isTyping && (
                     <div className="flex gap-2 justify-start">
-                        <div className="w-7 h-7 rounded-lg bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white shrink-0 shadow-sm">
+                        <div className="w-7 h-7 rounded-lg bg-emerald-500 flex items-center justify-center text-white shrink-0 shadow-sm">
                             <Sparkles className="w-3.5 h-3.5" />
                         </div>
                         <div className="bg-slate-100 rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-1">
@@ -109,7 +113,7 @@ const ChatSection = () => {
                 {QUICK_PROMPTS.map(p => (
                     <button
                         key={p} onClick={() => sendMessage(p)}
-                        className="text-[10px] sm:text-xs font-medium bg-slate-50 border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full hover:border-teal-300 hover:bg-teal-50 hover:text-teal-700 transition-all whitespace-nowrap"
+                        className="text-[10px] sm:text-xs font-medium bg-slate-50 border border-slate-200 text-slate-600 px-3 py-1.5 rounded-full hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 transition-all whitespace-nowrap"
                     >
                         {p}
                     </button>
@@ -123,13 +127,13 @@ const ChatSection = () => {
                         value={input}
                         onChange={e => setInput(e.target.value)}
                         onKeyDown={e => e.key === 'Enter' && sendMessage()}
-                        placeholder="Ask about your health…"
-                        className="flex-1 text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 placeholder:text-slate-300"
+                        placeholder={t('chat.placeholder')}
+                        className="flex-1 text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 placeholder:text-slate-300"
                     />
                     <button
                         onClick={() => sendMessage()}
                         disabled={!input.trim() || isTyping}
-                        className="w-11 h-11 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white hover:opacity-90 transition-all disabled:opacity-40 shadow-sm active:scale-95"
+                        className="w-11 h-11 bg-emerald-600 rounded-xl flex items-center justify-center text-white hover:bg-emerald-700 transition-all disabled:opacity-40 shadow-sm active:scale-95"
                     >
                         <Send className="w-4 h-4" />
                     </button>

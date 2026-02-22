@@ -64,7 +64,7 @@ export default function AdminLayout() {
                             <p className="text-xs font-semibold text-slate-800 leading-none">Dr. Admin</p>
                             <p className="text-[10px] text-slate-400">Clinical Coordinator</p>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                             A
                         </div>
                     </div>

@@ -28,8 +28,8 @@ function App() {
         <Route path="/auth/register" element={<AuthPage view="register" />} />
         <Route path="/auth/forgot-password" element={<AuthPage view="forgot" />} />
 
-        {/* Admin */}
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* Admin/Portal */}
+        <Route path="/portal" element={<AdminLayout />}>
           <Route index element={<AdminOverview />} />
           <Route path="patients" element={<PatientList />} />
           <Route path="patients/update" element={<UpdateClinicalRecord />} />
@@ -37,13 +37,13 @@ function App() {
           <Route path="emergencies" element={<EmergencyCases />} />
         </Route>
 
-        {/* Patient */}
-        <Route path="/patient/dashboard" element={<PatientDashboard />} />
-        <Route path="/patient/log" element={<PatientLog />} />
-        <Route path="/patient/chat" element={<PatientChat />} />
-        <Route path="/patient/reports" element={<PatientReports />} />
-        <Route path="/patient/notifications" element={<PatientNotifications />} />
-        <Route path="/patient/settings" element={<PatientSettings />} />
+        {/* Patient/Dashboard */}
+        <Route path="/dashboard" element={<PatientDashboard />} />
+        <Route path="/dashboard/log" element={<PatientLog />} />
+        <Route path="/dashboard/chat" element={<PatientChat />} />
+        <Route path="/dashboard/reports" element={<PatientReports />} />
+        <Route path="/dashboard/notifications" element={<PatientNotifications />} />
+        <Route path="/dashboard/settings" element={<PatientSettings />} />
       </Routes>
     </RouteLoader>
   )

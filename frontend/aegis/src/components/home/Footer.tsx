@@ -1,20 +1,22 @@
-import { ShieldCheck, Twitter, Linkedin, Github, CircleDot } from 'lucide-react'
+import { Shield, Twitter, Linkedin, Github, CircleDot } from 'lucide-react'
+import { useLanguage } from '../../i18n/LanguageContext'
 import { Link } from 'react-router-dom'
 
 const footerLinks = {
-    Product:  ['How It Works', 'Risk Monitor', 'For Clinicians', 'Mobile App'],
-    Company:  ['About Us', 'Blog', 'Research', 'Careers'],
-    Legal:    ['Privacy Policy', 'Terms of Service', 'HIPAA Compliance', 'Cookie Policy'],
-    Support:  ['Help Center', 'Contact Us', 'Report an Issue', 'Community'],
+    Product: ['How It Works', 'Risk Monitor', 'For Clinicians', 'Mobile App'],
+    Company: ['About Us', 'Blog', 'Research', 'Careers'],
+    Legal: ['Privacy Policy', 'Terms of Service', 'HIPAA Compliance', 'Cookie Policy'],
+    Support: ['Help Center', 'Contact Us', 'Report an Issue', 'Community'],
 }
 
 const socialLinks = [
-    { platform: 'Twitter',  Icon: Twitter  },
+    { platform: 'Twitter', Icon: Twitter },
     { platform: 'LinkedIn', Icon: Linkedin },
-    { platform: 'GitHub',   Icon: Github   },
+    { platform: 'GitHub', Icon: Github },
 ]
 
 const Footer = () => {
+    const { t } = useLanguage()
     return (
         <footer className="bg-white border-t border-slate-200">
             <div className="max-w-6xl mx-auto px-6 py-16">
@@ -24,10 +26,10 @@ const Footer = () => {
                     {/* Brand — matches auth navbar logo */}
                     <div className="md:col-span-1">
                         <Link to="/" className="flex items-center gap-2.5 mb-4">
-                            <div className="w-8 h-8 rounded-xl bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center shadow-sm">
-                                <ShieldCheck className="w-4 h-4 text-white" />
+                            <div className="flex items-center gap-2">
+                                <Shield className="w-6 h-6 text-emerald-600" />
+                                <span className="font-extrabold text-base text-slate-800 tracking-tight">{t('common.brand' as any)}</span>
                             </div>
-                            <span className="font-extrabold text-base text-slate-800 tracking-tight">Aegis</span>
                         </Link>
                         <p className="text-slate-500 text-sm leading-relaxed mb-5">
                             AI-powered stroke prevention & recovery. Your health, always protected.
@@ -73,7 +75,7 @@ const Footer = () => {
                     </p>
 
                     <div className="flex items-center gap-2 text-slate-400 text-xs">
-                        <CircleDot className="w-3 h-3 text-teal-500" />
+                        <CircleDot className="w-3 h-3 text-emerald-500" />
                         All systems operational
                     </div>
 

@@ -53,7 +53,7 @@ export default function NotifyCaretakerModal({ patient, onClose, onSend }: Notif
                 {/* Caretaker info */}
                 {patient.caretaker ? (
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4 flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                        <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
                             {patient.caretaker.name[0]}
                         </div>
                         <div>
@@ -81,7 +81,7 @@ export default function NotifyCaretakerModal({ patient, onClose, onSend }: Notif
                     onChange={(e) => setMessage(e.target.value)}
                     rows={3}
                     placeholder="Add specific instructions or context for the caretaker…"
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 resize-none transition-all mb-5"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 resize-none transition-all mb-5"
                 />
 
                 {/* Actions */}
@@ -95,7 +95,7 @@ export default function NotifyCaretakerModal({ patient, onClose, onSend }: Notif
                     <button
                         onClick={handleSend}
                         disabled={!patient.caretaker}
-                        className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white font-semibold text-sm py-3 rounded-xl hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
+                        className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-white font-semibold text-sm py-3 rounded-xl hover:bg-emerald-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
                     >
                         <Send className="w-4 h-4" />
                         Send Alert

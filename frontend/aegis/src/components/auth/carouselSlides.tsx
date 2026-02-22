@@ -25,7 +25,7 @@ export const SLIDES: Slide[] = [
       "Instant emergency alerts",
     ],
     icon: <Brain size={18} />,
-    overlay: "from-teal-900/70 via-teal-800/60 to-teal-900/85",
+    overlay: "from-emerald-950/80 via-slate-900/60 to-emerald-950/85",
   },
   {
     id: 2,
@@ -41,7 +41,7 @@ export const SLIDES: Slide[] = [
       "Automated caregiver alerts",
     ],
     icon: <Activity size={18} />,
-    overlay: "from-teal-900/70 via-teal-800/60 to-teal-900/85",
+    overlay: "from-emerald-950/80 via-slate-900/60 to-emerald-950/85",
   },
   {
     id: 3,
@@ -56,7 +56,7 @@ export const SLIDES: Slide[] = [
       "Progress tracking & reports",
     ],
     icon: <Heart size={18} />,
-    overlay: "from-teal-900/70 via-teal-800/60 to-teal-900/85",
+    overlay: "from-emerald-950/80 via-slate-900/60 to-emerald-950/85",
   },
   {
     id: 4,
@@ -71,6 +71,6 @@ export const SLIDES: Slide[] = [
       "24/7 emergency response",
     ],
     icon: <Shield size={18} />,
-    overlay: "from-teal-900/70 via-teal-800/60 to-teal-900/85",
+    overlay: "from-emerald-950/80 via-slate-900/60 to-emerald-950/85",
   },
 ];

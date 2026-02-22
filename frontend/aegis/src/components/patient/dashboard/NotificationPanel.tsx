@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { BellRing, ChevronRight, X } from 'lucide-react'
 import { MOCK_NOTIFICATIONS, NOTIFICATION_STYLES } from '../data/mockData'
+import { useLanguage } from '../../../i18n/LanguageContext'
 
 const NotificationsPanel = () => {
+    const { t } = useLanguage()
     const [open, setOpen] = useState(false)
     const [read, setRead] = useState<number[]>([])
 
@@ -15,14 +17,14 @@ const NotificationsPanel = () => {
             <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm ring-1 ring-slate-50">
                 <div className="flex items-center justify-between mb-4 sm:mb-5">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0">
+                        <div className="w-9 h-9 sm:w-10 sm:h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shadow-sm shrink-0">
                             <BellRing className="w-4 h-4 sm:w-5 sm:h-5" />
                         </div>
-                        <h2 className="text-base sm:text-lg font-bold text-slate-900">Notifications</h2>
+                        <h2 className="text-base sm:text-lg font-bold text-slate-900">{t('dashboard.notifications.title')}</h2>
                     </div>
                     {unread > 0 && (
                         <span className="bg-amber-100 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-200">
-                            {unread} new
+                            {t('dashboard.notifications.newCount').replace('{count}', unread.toString())}
                         </span>
                     )}
                 </div>
@@ -52,7 +54,7 @@ const NotificationsPanel = () => {
                     onClick={() => setOpen(true)}
                     className="w-full flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 text-slate-600 font-semibold py-3.5 rounded-2xl hover:bg-slate-100 transition-all text-sm"
                 >
-                    View All Notifications <ChevronRight className="w-4 h-4" />
+                    {t('dashboard.notifications.viewAll')} <ChevronRight className="w-4 h-4" />
                 </button>
             </div>
 
@@ -61,12 +63,12 @@ const NotificationsPanel = () => {
                     <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between mb-6">
                             <div>
-                                <h3 className="text-xl font-extrabold text-slate-900">All Notifications</h3>
-                                <p className="text-slate-400 text-sm">{unread} unread</p>
+                                <h3 className="text-xl font-extrabold text-slate-900">{t('dashboard.notifications.allTitle')}</h3>
+                                <p className="text-slate-400 text-sm">{t('dashboard.notifications.unreadCount').replace('{count}', unread.toString())}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button onClick={markAllRead} className="text-xs text-blue-500 font-semibold hover:underline">
-                                    Mark all read
+                                <button onClick={markAllRead} className="text-xs text-emerald-600 font-semibold hover:underline">
+                                    {t('dashboard.notifications.markAllRead')}
                                 </button>
                                 <button onClick={() => setOpen(false)} className="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition-colors ml-2">
                                     <X className="w-4 h-4" />

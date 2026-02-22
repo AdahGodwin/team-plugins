@@ -57,8 +57,8 @@ export default function AdminOverview() {
                     label="Total Patients"
                     value={patients.length}
                     Icon={Users}
-                    iconBg="bg-blue-50"
-                    iconColor="text-blue-500"
+                    iconBg="bg-slate-100"
+                    iconColor="text-slate-600"
                     sub="Across all risk levels"
                 />
                 <StatCard
@@ -81,8 +81,8 @@ export default function AdminOverview() {
                     label="Active Caretakers"
                     value={activeCaretakers.length}
                     Icon={Heart}
-                    iconBg="bg-violet-50"
-                    iconColor="text-violet-500"
+                    iconBg="bg-emerald-50"
+                    iconColor="text-emerald-500"
                     sub="Assigned to patients"
                 />
             </div>
@@ -93,8 +93,8 @@ export default function AdminOverview() {
                     <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                         <h2 className="font-bold text-slate-900 text-sm">Recent Activity</h2>
                         <Link
-                            to="/admin/patients"
-                            className="text-xs text-blue-600 font-semibold hover:underline flex items-center gap-1"
+                            to="/portal/patients"
+                            className="text-xs text-emerald-600 font-semibold hover:underline flex items-center gap-1"
                         >
                             View all <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
@@ -103,10 +103,10 @@ export default function AdminOverview() {
                         {recentlyUpdated.map((patient) => (
                             <li key={patient.uuid}>
                                 <Link
-                                    to={`/admin/patients/${patient.uuid}`}
+                                    to={`/portal/patients/${patient.uuid}`}
                                     className="flex items-center gap-4 px-6 py-4 hover:bg-slate-50 transition-colors"
                                 >
-                                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                    <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                         {patient.name[0]}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -146,13 +146,13 @@ export default function AdminOverview() {
                     <div className="mt-6 pt-5 border-t border-slate-100 space-y-2">
                         <p className="text-xs font-bold text-slate-500 uppercase tracking-wide">Quick Actions</p>
                         <Link
-                            to="/admin/patients"
-                            className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl bg-blue-50 text-blue-700 text-xs font-semibold hover:bg-blue-100 transition-colors"
+                            to="/portal/patients"
+                            className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold hover:bg-slate-200 transition-colors"
                         >
                             View All Patients <ArrowRight className="w-3.5 h-3.5" />
                         </Link>
                         <Link
-                            to="/admin/emergencies"
+                            to="/portal/emergencies"
                             className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl bg-rose-50 text-rose-700 text-xs font-semibold hover:bg-rose-100 transition-colors"
                         >
                             View Emergencies <ArrowRight className="w-3.5 h-3.5" />

@@ -1,14 +1,14 @@
 import { TrendingUp, TrendingDown, Minus, ChevronRight } from 'lucide-react'
 
 const PAST_LOGS = [
-    { date: 'Yesterday', bp: '135/85', hr: 74, mood: '😊', symptoms: 'None',           status: 'good'    },
-    { date: 'Feb 19',    bp: '140/90', hr: 78, mood: '😐', symptoms: 'Mild dizziness', status: 'warning' },
-    { date: 'Feb 18',    bp: '132/82', hr: 72, mood: '😊', symptoms: 'None',           status: 'good'    },
-    { date: 'Feb 17',    bp: '128/80', hr: 70, mood: '😄', symptoms: 'None',           status: 'good'    },
+    { date: 'Yesterday', bp: '135/85', hr: 74, mood: '😊', symptoms: 'None', status: 'good' },
+    { date: 'Feb 19', bp: '140/90', hr: 78, mood: '😐', symptoms: 'Mild dizziness', status: 'warning' },
+    { date: 'Feb 18', bp: '132/82', hr: 72, mood: '😊', symptoms: 'None', status: 'good' },
+    { date: 'Feb 17', bp: '128/80', hr: 70, mood: '😄', symptoms: 'None', status: 'good' },
 ]
 
 const STATUS_STYLE = {
-    good:    { dot: 'bg-teal-500',  bg: 'bg-white hover:bg-teal-50'  },
+    good: { dot: 'bg-emerald-500', bg: 'bg-white hover:bg-emerald-50' },
     warning: { dot: 'bg-amber-500', bg: 'bg-white hover:bg-amber-50' },
 }
 
@@ -24,10 +24,10 @@ export default function PastLogsTab() {
                     const style = STATUS_STYLE[log.status as keyof typeof STATUS_STYLE]
                     const bpNum = parseInt(log.bp.split('/')[0])
                     const trend = bpNum > 138
-                        ? <TrendingUp   className="w-3.5 h-3.5 text-amber-500" />
+                        ? <TrendingUp className="w-3.5 h-3.5 text-amber-500" />
                         : bpNum < 130
-                        ? <TrendingDown className="w-3.5 h-3.5 text-teal-500"  />
-                        : <Minus        className="w-3.5 h-3.5 text-slate-400"  />
+                            ? <TrendingDown className="w-3.5 h-3.5 text-emerald-500" />
+                            : <Minus className="w-3.5 h-3.5 text-slate-400" />
                     return (
                         <div
                             key={log.date}

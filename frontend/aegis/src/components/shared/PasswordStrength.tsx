@@ -6,10 +6,10 @@ export default function PasswordStrength({ password }: { password: string }) {
   if (/[0-9]/.test(password)) score++;
   if (/[^A-Za-z0-9]/.test(password)) score++;
   const levels = [
-    { label: "Weak",   bar: "w-1/4", color: "bg-red-400",    text: "text-red-500"    },
-    { label: "Fair",   bar: "w-2/4", color: "bg-orange-400", text: "text-orange-500" },
-    { label: "Good",   bar: "w-3/4", color: "bg-yellow-500", text: "text-yellow-600" },
-    { label: "Strong", bar: "w-full",color: "bg-teal-500",   text: "text-teal-600"   },
+    { label: "Weak", bar: "w-1/4", color: "bg-red-400", text: "text-red-500" },
+    { label: "Fair", bar: "w-2/4", color: "bg-orange-400", text: "text-orange-500" },
+    { label: "Good", bar: "w-3/4", color: "bg-yellow-500", text: "text-yellow-600" },
+    { label: "Strong", bar: "w-full", color: "bg-emerald-500", text: "text-emerald-600" },
   ];
   const level = levels[score - 1] ?? levels[0];
   return (

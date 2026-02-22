@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Globe, Check } from 'lucide-react'
-import { LANGUAGES } from '../../i18/languages'
-import { useLanguage } from '../../i18/LanguageContext'
+import { LANGUAGES } from '../../i18n/languages'
+import { useLanguage } from '../../i18n/LanguageContext'
 
 interface LanguageSwitcherProps {
     dropUp?: boolean
@@ -30,8 +30,8 @@ export default function LanguageSwitcher({ dropUp = false }: LanguageSwitcherPro
                 onClick={() => setOpen(o => !o)}
                 title="Change language"
                 className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition-colors ${open
-                        ? 'bg-blue-50 border-blue-200 text-blue-600'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                     }`}
             >
                 <Globe className="w-4 h-4 shrink-0" />
@@ -52,8 +52,8 @@ export default function LanguageSwitcher({ dropUp = false }: LanguageSwitcherPro
                             key={lang.code}
                             onClick={() => { setLocale(lang.code); setOpen(false) }}
                             className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${locale === lang.code
-                                    ? 'bg-blue-50 text-blue-600 font-bold'
-                                    : 'text-slate-600 hover:bg-slate-50 font-medium'
+                                ? 'bg-emerald-50 text-emerald-600 font-bold'
+                                : 'text-slate-600 hover:bg-slate-50 font-medium'
                                 }`}
                         >
                             <span className="text-lg shrink-0">{lang.flag}</span>
@@ -62,7 +62,7 @@ export default function LanguageSwitcher({ dropUp = false }: LanguageSwitcherPro
                                 <p className="text-[11px] text-slate-400 mt-0.5">{lang.label}</p>
                             </div>
                             {locale === lang.code && (
-                                <Check className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                                <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                             )}
                         </button>
                     ))}

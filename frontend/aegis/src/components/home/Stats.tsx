@@ -1,8 +1,8 @@
 const stats = [
-    { value: '80%', label: 'of stroke survivors experience relapse',  sublabel: 'within 5 years of first stroke'          },
-    { value: '80%', label: 'of relapses are preventable',             sublabel: 'with consistent behavioural monitoring'  },
-    { value: '3x',  label: 'higher risk when care continuity breaks', sublabel: 'after hospital discharge'                },
-    { value: '24/7',label: 'continuous AI monitoring',                sublabel: 'by your personal health partner'         },
+    { value: '80%', label: 'of stroke survivors experience relapse', sublabel: 'within 5 years of first stroke' },
+    { value: '80%', label: 'of relapses are preventable', sublabel: 'with consistent behavioural monitoring' },
+    { value: '3x', label: 'higher risk when care continuity breaks', sublabel: 'after hospital discharge' },
+    { value: '24/7', label: 'continuous AI monitoring', sublabel: 'by your personal health partner' },
 ]
 
 const Stats = () => {
@@ -21,9 +21,9 @@ const Stats = () => {
                     {stats.map((stat) => (
                         <div
                             key={stat.value}
-                            className="group flex flex-col items-center text-center p-6 rounded-2xl border border-slate-100 bg-slate-50 hover:border-teal-200 hover:bg-teal-50/30 transition-all shadow-sm"
+                            className="group flex flex-col items-center text-center p-6 rounded-2xl border border-slate-100 bg-slate-50 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all shadow-sm"
                         >
-                            <div className="text-4xl md:text-5xl font-extrabold bg-linear-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent mb-2 transition-transform group-hover:scale-105">
+                            <div className="text-4xl md:text-5xl font-extrabold text-emerald-600 mb-2 transition-transform group-hover:scale-105">
                                 {stat.value}
                             </div>
                             <p className="text-slate-800 font-semibold text-sm mb-1 leading-snug">{stat.label}</p>

@@ -4,13 +4,13 @@ const levels = [
     {
         tier: '01',
         label: 'Behavioral Prevention',
-        color: 'from-blue-500 to-teal-500',
-        textColor: 'text-blue-600',
-        borderColor: 'border-blue-200',
-        bgColor: 'bg-blue-50',
-        pillBg: 'bg-blue-50',
-        pillBorder: 'border-blue-100',
-        pillText: 'text-blue-600',
+        color: 'bg-emerald-600',
+        textColor: 'text-emerald-600',
+        borderColor: 'border-emerald-200',
+        bgColor: 'bg-emerald-50',
+        pillBg: 'bg-emerald-50',
+        pillBorder: 'border-emerald-100',
+        pillText: 'text-emerald-600',
         icon: <Bell className="w-6 h-6" />,
         trigger: 'Low & Moderate Risk',
         headline: 'Personalized Daily Guidance',
@@ -25,7 +25,7 @@ const levels = [
     {
         tier: '02',
         label: 'Clinical Escalation',
-        color: 'from-amber-400 to-orange-500',
+        color: 'bg-amber-500',
         textColor: 'text-amber-600',
         borderColor: 'border-amber-200',
         bgColor: 'bg-amber-50',
@@ -46,7 +46,7 @@ const levels = [
     {
         tier: '03',
         label: 'Emergency Fallback',
-        color: 'from-rose-500 to-red-600',
+        color: 'bg-rose-600',
         textColor: 'text-rose-600',
         borderColor: 'border-rose-200',
         bgColor: 'bg-rose-50',
@@ -81,7 +81,7 @@ const EscalationLevels = () => {
 
                 <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 text-center mb-4 tracking-tight">
                     The Right Response,{' '}
-                    <span className="bg-linear-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">
+                    <span className="text-emerald-600">
                         At Every Level
                     </span>
                 </h2>
@@ -99,7 +99,7 @@ const EscalationLevels = () => {
 
                                 {/* Left: Icon + tier */}
                                 <div className="flex items-start gap-4 md:w-64 shrink-0">
-                                    <div className={`w-12 h-12 rounded-xl bg-linear-to-br ${level.color} flex items-center justify-center text-white shrink-0 shadow-sm`}>
+                                    <div className={`w-12 h-12 rounded-xl ${level.color} flex items-center justify-center text-white shrink-0 shadow-sm`}>
                                         {level.icon}
                                     </div>
                                     <div>

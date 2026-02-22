@@ -20,7 +20,7 @@ export default function ToastNotification({
     }, [message, onDismiss, durationMs])
 
     const Icon = variant === 'alert' ? Bell : Check
-    const iconColor = variant === 'alert' ? 'text-amber-400' : 'text-teal-400'
+    const iconColor = variant === 'alert' ? 'text-amber-400' : 'text-emerald-400'
 
     return (
         <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white text-sm font-medium px-5 py-3 rounded-xl shadow-xl flex items-center gap-2 animate-in">

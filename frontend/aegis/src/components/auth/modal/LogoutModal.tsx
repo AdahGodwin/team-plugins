@@ -1,13 +1,15 @@
 import { LogOut, X } from 'lucide-react'
+import { useLanguage } from '../../../i18n/LanguageContext'
 
 interface LogoutModalProps {
     onConfirm: () => void
-    onCancel:  () => void
+    onCancel: () => void
 }
 
 export default function LogoutModal({ onConfirm, onCancel }: LogoutModalProps) {
+    const { t } = useLanguage()
     return (
-        <div className="fixed inset-0 z-100 flex items-center justify-center px-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center px-4">
 
             <div
                 className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -25,9 +27,9 @@ export default function LogoutModal({ onConfirm, onCancel }: LogoutModalProps) {
                     <LogOut className="w-5 h-5 text-rose-500" />
                 </div>
                 <div>
-                    <h2 className="text-slate-900 font-extrabold text-lg">Log out of Aegis?</h2>
+                    <h2 className="text-slate-900 font-extrabold text-lg">{t('auth.logoutConfirmTitle')}</h2>
                     <p className="text-slate-400 text-sm mt-1 leading-relaxed">
-                        You'll need to sign back in to access your health dashboard and data.
+                        {t('auth.logoutConfirmMessage')}
                     </p>
                 </div>
                 <div className="flex gap-3">
@@ -35,13 +37,13 @@ export default function LogoutModal({ onConfirm, onCancel }: LogoutModalProps) {
                         onClick={onCancel}
                         className="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 text-sm font-semibold hover:bg-slate-50 transition-colors"
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </button>
                     <button
                         onClick={onConfirm}
                         className="flex-1 py-3 rounded-xl bg-rose-500 text-white text-sm font-bold hover:bg-rose-600 transition-colors shadow-sm"
                     >
-                        Yes, log out
+                        {t('auth.logoutConfirmButton')}
                     </button>
                 </div>
             </div>

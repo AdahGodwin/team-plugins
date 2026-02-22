@@ -1,5 +1,6 @@
 import { Volume2, ALargeSmall } from 'lucide-react'
 import { useAccessibility } from '../../accessibility/AccessibilityContext'
+import { useLanguage } from '../../i18n/LanguageContext'
 import LanguageSwitcher from './LanguageSwitcher'
 
 interface AccessibilityBarProps {
@@ -8,6 +9,7 @@ interface AccessibilityBarProps {
 
 export default function AccessibilityBar({ dropUp = false }: AccessibilityBarProps) {
     const { textSize, setTextSize, isSpeaking } = useAccessibility()
+    const { t } = useLanguage()
     const isLarge = textSize === 'large'
 
     return (
@@ -15,10 +17,10 @@ export default function AccessibilityBar({ dropUp = false }: AccessibilityBarPro
             <LanguageSwitcher dropUp={dropUp} />
             <button
                 onClick={() => setTextSize(isLarge ? 'normal' : 'large')}
-                title={isLarge ? 'Switch to normal text' : 'Switch to large text'}
+                title={isLarge ? t('accessibility.switchNormal' as any) : t('accessibility.switchLarge' as any)}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-colors ${isLarge
-                        ? 'bg-blue-50 border-blue-200 text-blue-600'
-                        : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-600'
+                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
                     }`}
             >
                 <ALargeSmall className="w-4 h-4" />
@@ -26,9 +28,9 @@ export default function AccessibilityBar({ dropUp = false }: AccessibilityBarPro
             </button>
 
             {isSpeaking && (
-                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-teal-50 border border-teal-200 text-teal-600 text-xs font-semibold">
+                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-semibold">
                     <Volume2 className="w-4 h-4 animate-pulse" />
-                    <span className="hidden sm:inline">Speaking…</span>
+                    <span className="hidden sm:inline">{t('accessibility.speaking' as any)}</span>
                 </div>
             )}
 

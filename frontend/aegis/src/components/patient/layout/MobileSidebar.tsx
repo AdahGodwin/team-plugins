@@ -12,6 +12,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import LogoutModal from "../../auth/modal/LogoutModal";
 import { MOCK_PATIENT, RISK_CONFIG } from "../data/mockData";
 import AccessibilityBar from "../../common/AccessibilityBar";
+import { useLanguage } from "../../../i18n/LanguageContext";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -24,35 +25,30 @@ const ICON_MAP = {
 
 const NAV_ITEMS = [
   {
-    label: "Dashboard",
     icon: "LayoutDashboard",
     id: "dashboard",
-    path: "/patient/dashboard",
+    path: "/dashboard",
   },
   {
-    label: "Daily Log",
     icon: "ClipboardList",
     id: "log",
-    path: "/patient/log",
+    path: "/dashboard/log",
   },
-  { label: "Chat", icon: "MessageCircle", id: "chat", path: "/patient/chat" },
+  { icon: "MessageCircle", id: "chat", path: "/dashboard/chat" },
   {
-    label: "Reports",
     icon: "FileText",
     id: "reports",
-    path: "/patient/reports",
+    path: "/dashboard/reports",
   },
   {
-    label: "Notifications",
     icon: "Bell",
     id: "notifications",
-    path: "/patient/notifications",
+    path: "/dashboard/notifications",
   },
   {
-    label: "Settings",
     icon: "Settings",
     id: "settings",
-    path: "/patient/settings",
+    path: "/dashboard/settings",
   },
 ];
 
@@ -64,6 +60,7 @@ interface MobileSidebarProps {
 const MobileSidebar = ({ onClose, unreadCount }: MobileSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const [showLogout, setShowLogout] = useState(false);
 
   const handleNav = (path: string) => {
@@ -82,11 +79,11 @@ const MobileSidebar = ({ onClose, unreadCount }: MobileSidebarProps) => {
         <aside className="absolute left-0 top-0 h-full w-72 bg-white shadow-2xl flex flex-col">
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-xl bg-emerald-600 flex items-center justify-center shadow-sm">
                 <ShieldCheck className="w-4 h-4 text-white" />
               </div>
               <span className="font-extrabold text-slate-800 tracking-tight">
-                Aegis
+                {t('common.brand')}
               </span>
             </div>
             <button
@@ -102,17 +99,23 @@ const MobileSidebar = ({ onClose, unreadCount }: MobileSidebarProps) => {
             const riskCfg = RISK_CONFIG[MOCK_PATIENT.riskLevel]
             return (
               <div className="px-5 py-3 border-b border-slate-100 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
+                <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold border-2 border-slate-100 shadow-sm shrink-0">
                   {MOCK_PATIENT.name[0]}
                 </div>
                 <div className="min-w-0">
                   <p className="text-slate-800 font-bold text-sm truncate">{MOCK_PATIENT.fullName}</p>
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className={`w-1.5 h-1.5 rounded-full ${riskCfg.dot}`} />
-                    <p className={`text-xs font-medium ${riskCfg.text}`}>{riskCfg.label}</p>
+                    <p className={`text-xs font-medium ${riskCfg.text}`}>
+                      {MOCK_PATIENT.riskLevel === 'stable' ? t('dashboard.riskStableLabel') :
+                        MOCK_PATIENT.riskLevel === 'elevated' ? t('dashboard.riskElevatedLabel') :
+                          t('dashboard.riskHighLabel')}
+                    </p>
                     <span className="text-slate-300 text-xs">·</span>
                     <Flame className="w-3 h-3 text-orange-500" />
-                    <p className="text-orange-500 text-xs font-semibold">{MOCK_PATIENT.streakDays}d streak</p>
+                    <p className="text-orange-500 text-xs font-semibold">
+                      {t('dashboard.streakUnit').replace('{days}', MOCK_PATIENT.streakDays.toString())}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -120,30 +123,34 @@ const MobileSidebar = ({ onClose, unreadCount }: MobileSidebarProps) => {
           })()}
 
           {/* Next appointment */}
-          <div className="mx-4 mt-3 p-3 bg-blue-50 border border-blue-100 rounded-xl">
+          <div className="mx-4 mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
             <div className="flex items-center gap-2 mb-1">
-              <Calendar className="w-3.5 h-3.5 text-blue-500" />
-              <p className="text-blue-700 text-xs font-bold">Next Appointment</p>
+              <Calendar className="w-3.5 h-3.5 text-emerald-500" />
+              <p className="text-emerald-700 text-xs font-bold">{t('nav.nextAppointment')}</p>
             </div>
             <p className="text-slate-600 text-xs leading-relaxed">{MOCK_PATIENT.nextAppointment}</p>
           </div>
 
           <nav className="flex-1 px-3 py-4 space-y-1">
-            {NAV_ITEMS.map(({ label, icon, id, path }) => {
+            {NAV_ITEMS.map(({ icon, id, path }) => {
               const Icon = ICON_MAP[icon as keyof typeof ICON_MAP];
               const isActive = location.pathname === path;
+              const label = t(`nav.${id}` as any);
               return (
                 <button
                   key={id}
                   onClick={() => handleNav(path)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${isActive
-                    ? "bg-blue-50 text-blue-600 border border-blue-100"
-                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
+                  className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
+                    ? "bg-emerald-50 text-emerald-700 font-semibold"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                     }`}
                 >
-                  <Icon className="w-4 h-4 shrink-0" />
+                  <Icon
+                    className={`w-4 h-4 shrink-0 ${isActive ? "text-emerald-500" : "text-slate-400 group-hover:text-slate-600"
+                      }`}
+                  />
                   {label}
-                  {label === "Notifications" && unreadCount > 0 && (
+                  {id === "notifications" && unreadCount > 0 && (
                     <span className="ml-auto bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                       {unreadCount}
                     </span>
@@ -156,7 +163,7 @@ const MobileSidebar = ({ onClose, unreadCount }: MobileSidebarProps) => {
           {/* Accessibility + Logout */}
           <div className="px-3 py-4 border-t border-slate-100 space-y-2">
             <div className="px-3 py-2">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Accessibility</p>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{t('nav.accessibility')}</p>
               <AccessibilityBar dropUp />
             </div>
             <button
@@ -164,7 +171,7 @@ const MobileSidebar = ({ onClose, unreadCount }: MobileSidebarProps) => {
               className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all"
             >
               <LogOut className="w-4 h-4 shrink-0" />
-              Logout
+              {t('nav.logout' as any)}
             </button>
           </div>
         </aside>

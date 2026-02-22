@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, AlertCircle } from "lucide-react";
 import InputField from "../shared/InputField";
+import { useLanguage } from "../../i18n/LanguageContext";
 
 interface Props {
   onGoRegister: () => void;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Partial<typeof form>>({});
@@ -37,13 +39,13 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
     return (
       <div className="flex flex-col items-center gap-6 rounded-2xl bg-white p-8 text-center shadow-xl ring-1 ring-slate-100 sm:rounded-3xl sm:p-10">
         <div className="relative flex h-20 w-20 items-center justify-center">
-          <div className="absolute inset-0 animate-ping rounded-full bg-teal-100 opacity-60" />
-          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-linear-to-br from-teal-400 to-teal-600 shadow-lg">
+          <div className="absolute inset-0 animate-ping rounded-full bg-emerald-100 opacity-60" />
+          <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500 shadow-lg">
             <ShieldCheck className="text-white" size={38} />
           </div>
         </div>
         <div>
-          <h2 className="text-xl font-extrabold text-slate-800 sm:text-2xl">Welcome back!</h2>
+          <h2 className="text-xl font-extrabold text-slate-800 sm:text-2xl">{t('auth.login' as any)}!</h2>
           <p className="mt-2 text-sm text-slate-500">You've logged in successfully. Redirecting you now...</p>
         </div>
       </div>
@@ -55,14 +57,14 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
 
       {/* Heading */}
       <div className="mb-6 flex flex-col gap-2.5">
-        <div className="flex w-fit items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-          <span className="text-xs font-semibold uppercase tracking-widest text-blue-600">
-            Welcome Back
+        <div className="flex w-fit items-center gap-1.5 rounded-full border border-emerald-100 bg-emerald-50 px-3 py-1">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <span className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
+            {t('auth.login' as any)}
           </span>
         </div>
         <div>
-          <h1 className="text-xl font-extrabold text-slate-800 sm:text-2xl">Log In to Aegis</h1>
+          <h1 className="text-xl font-extrabold text-slate-800 sm:text-2xl font-display">{t('auth.login' as any)} to Aegis</h1>
           <p className="mt-1 text-sm text-slate-500 sm:text-base">
             Sign in to your account to continue.
           </p>
@@ -71,7 +73,7 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
         <InputField
-          label="Email Address" type="email"
+          label={t('auth.email' as any)} type="email"
           placeholder="e.g. margaret@example.com"
           icon={<Mail size={15} />}
           value={form.email} onChange={update("email")}
@@ -81,34 +83,34 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
 
         <div className="flex flex-col gap-1.5">
           <InputField
-            label="Password"
+            label={t('auth.password' as any)}
             type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
+            placeholder="••••••••"
             icon={<Lock size={15} />}
             value={form.password} onChange={update("password")}
             error={errors.password}
             rightElement={
-              <span onClick={() => setShowPassword(p => !p)}>
+              <button type="button" onClick={() => setShowPassword(p => !p)} className="text-slate-400 hover:text-slate-600">
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </span>
+              </button>
             }
           />
           <div className="flex justify-end">
             <button
               type="button"
               onClick={onGoForgot}
-              className="text-sm font-semibold text-blue-500 hover:underline"
+              className="text-sm font-semibold text-emerald-600 hover:underline"
             >
-              Forgot password?
+              {t('auth.forgotPassword' as any)}
             </button>
           </div>
         </div>
 
         <button
           type="submit"
-          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-blue-500 to-teal-500 py-3.5 text-base font-bold text-white shadow-md transition-all hover:shadow-lg hover:opacity-95 active:scale-[0.98] sm:rounded-2xl sm:py-4"
+          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] sm:rounded-2xl sm:py-4"
         >
-          Log In
+          {t('auth.login' as any)}
           <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
         </button>
 
@@ -117,9 +119,9 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
           <button
             type="button"
             onClick={onGoRegister}
-            className="font-semibold text-blue-500 hover:underline"
+            className="font-semibold text-emerald-600 hover:underline"
           >
-            Create one here
+            {t('auth.register' as any)}
           </button>
         </p>
 
@@ -127,7 +129,7 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
           <AlertCircle size={13} className="mt-0.5 shrink-0 text-slate-300" />
           <p className="text-xs leading-relaxed text-slate-400 sm:text-sm">
             <span className="font-medium text-slate-500">Disclaimer: </span>
-            Aegis does not replace professional medical care. Always consult your physician.
+            {t('common.medicalDisclaimer' as any)}
           </p>
         </div>
       </form>

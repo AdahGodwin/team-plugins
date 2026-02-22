@@ -39,15 +39,15 @@ const Caretaker = () => {
             <div className="max-w-6xl mx-auto px-6">
 
                 <div className="flex justify-center mb-6">
-                    <span className="inline-flex items-center gap-2 border border-blue-100 bg-blue-50 text-blue-600 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                    <span className="inline-flex items-center gap-2 border border-emerald-100 bg-emerald-50 text-emerald-600 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         Caretaker Monitoring
                     </span>
                 </div>
 
                 <h2 className="text-4xl md:text-5xl font-extrabold text-slate-900 text-center mb-4 tracking-tight">
                     Care Is a{' '}
-                    <span className="bg-linear-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent">
+                    <span className="text-emerald-600">
                         Team Effort
                     </span>
                 </h2>
@@ -61,9 +61,9 @@ const Caretaker = () => {
                         {capabilities.map(({ Icon, title, description }) => (
                             <div
                                 key={title}
-                                className="flex items-start gap-4 p-5 rounded-2xl border border-slate-200 bg-white hover:border-teal-200 hover:bg-teal-50/30 transition-all group shadow-sm ring-1 ring-slate-50"
+                                className="flex items-start gap-4 p-5 rounded-2xl border border-slate-200 bg-white hover:border-emerald-200 hover:bg-emerald-50/30 transition-all group shadow-sm ring-1 ring-slate-50"
                             >
-                                <div className="w-10 h-10 bg-linear-to-br from-blue-500 to-teal-500 rounded-xl flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform shadow-sm">
+                                <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform shadow-sm">
                                     <Icon className="w-5 h-5" />
                                 </div>
                                 <div>
@@ -81,12 +81,12 @@ const Caretaker = () => {
                                 alt="A family member helping an elderly patient with health monitoring"
                                 className="w-full h-115 object-cover object-top"
                             />
-                            <div className="absolute inset-0 bg-linear-to-t from-slate-900/50 via-transparent to-transparent" />
+                            <div className="absolute inset-0 bg-slate-900/40" />
                         </div>
 
                         <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl ring-1 ring-slate-100 border border-slate-200 p-4 w-64">
                             <div className="flex items-center gap-2 mb-3">
-                                <div className="w-5 h-5 bg-linear-to-br from-blue-500 to-teal-500 rounded-md flex items-center justify-center">
+                                <div className="w-5 h-5 bg-emerald-600 rounded-md flex items-center justify-center">
                                     <PenLine className="w-3 h-3 text-white" />
                                 </div>
                                 <span className="text-slate-700 text-xs font-semibold">Logged by caretaker</span>
@@ -94,9 +94,9 @@ const Caretaker = () => {
                             <div className="grid grid-cols-2 gap-2 text-xs">
                                 {[
                                     { label: 'Blood Pressure', value: '128/82' },
-                                    { label: 'Medications',    value: 'Taken ✓' },
-                                    { label: 'Mood',           value: 'Calm'    },
-                                    { label: 'Activity',       value: 'Light walk' },
+                                    { label: 'Medications', value: 'Taken ✓' },
+                                    { label: 'Mood', value: 'Calm' },
+                                    { label: 'Activity', value: 'Light walk' },
                                 ].map(({ label, value }) => (
                                     <div key={label} className="bg-slate-50 rounded-lg p-2 border border-slate-100">
                                         <p className="text-slate-400 mb-0.5">{label}</p>
@@ -105,7 +105,7 @@ const Caretaker = () => {
                                 ))}
                             </div>
                             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100">
-                                <div className="w-6 h-6 rounded-full bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                <div className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                     A
                                 </div>
                                 <div>
@@ -120,21 +120,21 @@ const Caretaker = () => {
                     </div>
                 </div>
 
-                <div className="mt-16 bg-linear-to-r from-blue-500 to-teal-500 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 text-white shadow-xl">
+                <div className="mt-16 bg-emerald-600 rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 text-white shadow-xl">
                     <div className="flex items-center gap-4">
                         <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0 ring-1 ring-white/20">
                             <UserPlus className="w-6 h-6" />
                         </div>
                         <div>
                             <p className="font-bold text-lg">Invite a caretaker in seconds</p>
-                            <p className="text-blue-50/90 text-sm leading-relaxed">
+                            <p className="text-emerald-50/90 text-sm leading-relaxed">
                                 Send an invite link. They'll set up their account and be connected to your health profile instantly.
                             </p>
                         </div>
                     </div>
                     <Link
                         to="/auth/register"
-                        className="group shrink-0 inline-flex items-center gap-2 bg-white text-blue-600 font-bold text-sm px-7 py-3.5 rounded-2xl hover:bg-blue-50 transition-all shadow-md active:scale-[0.98]"
+                        className="group shrink-0 inline-flex items-center gap-2 bg-white text-emerald-600 font-bold text-sm px-7 py-3.5 rounded-2xl hover:bg-emerald-50 transition-all shadow-md active:scale-[0.98]"
                     >
                         Get Started
                         <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />

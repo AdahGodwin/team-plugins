@@ -3,13 +3,13 @@ import { TYPE_CONFIG } from './notifTypes'
 import type { Notif } from './notifTypes'
 
 interface NotifCardProps {
-    n:         Notif
-    onRead:    (id: number) => void
+    n: Notif
+    onRead: (id: number) => void
     onDismiss: (id: number) => void
 }
 
 export default function NotifCard({ n, onRead, onDismiss }: NotifCardProps) {
-    const cfg  = TYPE_CONFIG[n.type]
+    const cfg = TYPE_CONFIG[n.type]
     const Icon = cfg.icon
 
     return (
@@ -20,13 +20,13 @@ export default function NotifCard({ n, onRead, onDismiss }: NotifCardProps) {
                 'transition-all cursor-pointer group',
                 n.read
                     ? 'bg-white border-slate-200 hover:bg-slate-50'
-                    : 'bg-blue-50 border-blue-100 hover:bg-blue-100/60',
+                    : 'bg-emerald-50 border-emerald-100 hover:bg-emerald-100/60',
                 n.pinned ? 'ring-1 ring-rose-200' : '',
             ].join(' ')}
         >
             {/* Unread dot */}
             {!n.read && (
-                <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-blue-500" />
+                <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-emerald-500" />
             )}
 
             {/* Icon */}
@@ -61,7 +61,7 @@ export default function NotifCard({ n, onRead, onDismiss }: NotifCardProps) {
                     {!n.read && (
                         <button
                             onClick={e => { e.stopPropagation(); onRead(n.id) }}
-                            className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-teal-600 hover:text-teal-700 transition-colors"
+                            className="flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
                         >
                             <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             Mark read

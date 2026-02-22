@@ -50,8 +50,8 @@ export default function UpdateClinicalRecord() {
             <p className="text-xs font-bold uppercase tracking-wide text-slate-400">Current Risk</p>
             <RiskBadge level={patient.riskLevel} />
             <Link
-                to={`/admin/patients/${patient.uuid}`}
-                className="text-xs text-blue-600 font-semibold hover:underline flex items-center gap-1"
+                to={`/portal/patients/${patient.uuid}`}
+                className="text-xs text-emerald-600 font-semibold hover:underline flex items-center gap-1"
             >
                 View Profile <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -80,12 +80,12 @@ export default function UpdateClinicalRecord() {
                             onChange={(event) => { setUuidInput(event.target.value); setErrorMessage('') }}
                             onKeyDown={(event) => { if (event.key === 'Enter') handleLoadRecord() }}
                             placeholder="ae1f2c3d-0001-4b5e-8f9a-000000000001"
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all"
+                            className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition-all"
                         />
                     </div>
                     <button
                         onClick={handleLoadRecord}
-                        className="flex items-center justify-center gap-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-teal-500 text-white px-5 py-3 sm:py-2.5 rounded-xl hover:opacity-90 shadow-sm transition-all"
+                        className="flex items-center justify-center gap-2 text-sm font-semibold bg-emerald-600 text-white px-5 py-3 sm:py-2.5 rounded-xl hover:bg-emerald-700 shadow-sm transition-all"
                     >
                         <ClipboardEdit className="w-4 h-4" />
                         Load Record
@@ -102,7 +102,7 @@ export default function UpdateClinicalRecord() {
                         <button
                             key={item.value}
                             onClick={() => setUuidInput(item.value)}
-                            className="text-blue-500 hover:underline truncate max-w-[160px] sm:max-w-none"
+                            className="text-emerald-500 hover:underline truncate max-w-[160px] sm:max-w-none"
                         >
                             {item.label}
                         </button>
@@ -185,12 +185,12 @@ export default function UpdateClinicalRecord() {
                         <div className="flex items-center gap-4 pt-2">
                             <button
                                 onClick={handleSaveChanges}
-                                className="flex items-center gap-2 text-sm font-bold bg-gradient-to-r from-blue-500 to-teal-500 text-white px-6 py-3 rounded-xl shadow-sm hover:opacity-90 active:scale-[0.98] transition-all"
+                                className="flex items-center gap-2 text-sm font-bold bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-sm hover:bg-emerald-700 active:scale-[0.98] transition-all"
                             >
                                 Save Changes
                             </button>
                             {isSaved && (
-                                <span className="flex items-center gap-1.5 text-teal-600 text-sm font-semibold">
+                                <span className="flex items-center gap-1.5 text-emerald-600 text-sm font-semibold">
                                     <CheckCircle2 className="w-4 h-4" />
                                     Saved successfully
                                 </span>

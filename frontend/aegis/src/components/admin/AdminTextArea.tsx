@@ -12,7 +12,7 @@ export default function AdminTextArea({ label, className = '', ...textareaProps 
             </label>
             <textarea
                 {...textareaProps}
-                className={`w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 resize-none transition-all disabled:opacity-50 ${className}`}
+                className={`w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 resize-none transition-all disabled:opacity-50 ${className}`}
             />
         </div>
     )

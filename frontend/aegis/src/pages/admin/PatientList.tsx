@@ -48,8 +48,8 @@ export default function PatientList() {
                     </p>
                 </div>
                 <Link
-                    to="/admin/patients/update"
-                    className="inline-flex items-center gap-2 text-sm font-semibold bg-gradient-to-r from-blue-500 to-teal-500 text-white px-4 py-2.5 rounded-xl shadow-sm hover:opacity-90 transition-all self-start sm:self-auto"
+                    to="/portal/patients/update"
+                    className="inline-flex items-center gap-2 text-sm font-semibold bg-emerald-600 text-white px-4 py-2.5 rounded-xl shadow-sm hover:bg-emerald-700 transition-all self-start sm:self-auto"
                 >
                     Update Record <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -65,7 +65,7 @@ export default function PatientList() {
                         value={searchQuery}
                         onChange={(event) => handleSearch(event.target.value)}
                         placeholder="Search by name or patient UUID…"
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 transition-all"
                     />
                 </div>
 
@@ -77,8 +77,8 @@ export default function PatientList() {
                             key={option}
                             onClick={() => handleRisk(option)}
                             className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all capitalize ${riskFilter === option
-                                    ? 'bg-blue-500 text-white border-blue-500'
-                                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                                 }`}
                         >
                             {option}
@@ -101,7 +101,7 @@ export default function PatientList() {
                         </p>
                         <button
                             onClick={handleClear}
-                            className="mt-4 text-sm font-semibold text-blue-600 hover:underline"
+                            className="mt-4 text-sm font-semibold text-emerald-600 hover:underline"
                         >
                             Clear filters
                         </button>
@@ -126,11 +126,11 @@ export default function PatientList() {
                                         <tr
                                             key={patient.uuid}
                                             className="hover:bg-slate-50 transition-colors cursor-pointer"
-                                            onClick={() => { window.location.href = `/admin/patients/${patient.uuid}` }}
+                                            onClick={() => { window.location.href = `/portal/patients/${patient.uuid}` }}
                                         >
                                             <td className="px-4 py-3.5">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                                                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
                                                         {patient.name[0]}
                                                     </div>
                                                     <div className="min-w-0">
@@ -162,9 +162,9 @@ export default function PatientList() {
                                             </td>
                                             <td className="px-4 py-3.5">
                                                 <Link
-                                                    to={`/admin/patients/${patient.uuid}`}
+                                                    to={`/portal/patients/${patient.uuid}`}
                                                     onClick={(event) => event.stopPropagation()}
-                                                    className="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1 whitespace-nowrap"
+                                                    className="text-xs font-semibold text-emerald-600 hover:underline flex items-center gap-1 whitespace-nowrap"
                                                 >
                                                     View <ArrowRight className="w-3.5 h-3.5" />
                                                 </Link>

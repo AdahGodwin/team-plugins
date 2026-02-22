@@ -23,13 +23,13 @@ export default function ReportHighlights() {
             <div className="grid md:grid-cols-2 gap-4">
                 <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                     <h3 className="text-slate-900 font-bold text-sm mb-4 flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-teal-500" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                         This Month's Wins
                     </h3>
                     <div className="space-y-3">
                         {WINS.map(w => (
                             <div key={w} className="flex items-start gap-2.5">
-                                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 mt-1.5 shrink-0" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
                                 <p className="text-slate-600 text-sm">{w}</p>
                             </div>
                         ))}
@@ -53,18 +53,18 @@ export default function ReportHighlights() {
             </div>
 
             {/* Doctor note */}
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
+            <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-5 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0">
                     AO
                 </div>
                 <div>
-                    <p className="text-blue-800 font-bold text-sm">Dr Amara Osei · Last note</p>
-                    <p className="text-blue-600 text-xs mt-1 leading-relaxed">
+                    <p className="text-emerald-800 font-bold text-sm">Dr Amara Osei · Last note</p>
+                    <p className="text-emerald-600 text-xs mt-1 leading-relaxed">
                         "{MOCK_PATIENT.name}'s BP is showing improvement but still above target.
                         Continue current medication. Reduce sodium intake and increase physical
                         activity. Review in 3 weeks."
                     </p>
-                    <p className="text-blue-400 text-[10px] mt-2">14 November 2025</p>
+                    <p className="text-emerald-400 text-[10px] mt-2">14 November 2025</p>
                 </div>
             </div>
 
