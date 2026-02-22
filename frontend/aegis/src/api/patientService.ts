@@ -78,3 +78,22 @@ export async function notifyCaregiver(
   const { data } = await client.post<NotifyEnvelope>('/api/notify/caregiver', payload)
   return data.data
 }
+
+// ── Daily reminder broadcast ──────────────────────────────────────────────────
+
+export interface DailyReminderResult {
+  sent: number
+  failed: number
+  total: number
+  message: string
+}
+
+interface DailyReminderEnvelope {
+  success: boolean
+  data: DailyReminderResult
+}
+
+export async function sendDailyReminders(): Promise<DailyReminderResult> {
+  const { data } = await client.post<DailyReminderEnvelope>('/api/admin/notify-all')
+  return data.data
+}

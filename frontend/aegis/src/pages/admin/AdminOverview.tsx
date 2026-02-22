@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
     Users, AlertTriangle, ClipboardList, Heart, ArrowRight,
-    Clock, AlertCircle, Loader2, Activity,
+    Clock, AlertCircle, Loader2, Activity, Mail, CheckCircle2,
 } from 'lucide-react'
-import { fetchDashboard } from '../../api/patientService'
+import { fetchDashboard, sendDailyReminders } from '../../api/patientService'
 import type { DashboardData, RecentActivityItem } from '../../types/dashboard.types'
 import { timeAgo } from '../../utils/dateUtils'
 import StatCard from '../../components/admin/StatCard'
@@ -28,6 +28,30 @@ export default function AdminOverview() {
     const [data, setData] = useState<DashboardData | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
+
+    // ── Daily reminder state ───────────────────────────────────────────────
+    const [reminderState, setReminderState] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+    const [reminderMessage, setReminderMessage] = useState('')
+
+    const handleSendReminders = async () => {
+        if (reminderState === 'sending') return
+        setReminderState('sending')
+        setReminderMessage('')
+        try {
+            const result = await sendDailyReminders()
+            setReminderState('success')
+            setReminderMessage(result.message)
+        } catch (err: any) {
+            setReminderState('error')
+            setReminderMessage(err.response?.data?.error ?? 'Failed to send reminders. Please try again.')
+        } finally {
+            // Reset back to idle after 5 seconds
+            setTimeout(() => {
+                setReminderState('idle')
+                setReminderMessage('')
+            }, 5000)
+        }
+    }
 
     useEffect(() => {
         fetchDashboard()
@@ -62,15 +86,38 @@ export default function AdminOverview() {
                     </p>
                 </div>
 
-                {openEmergencies > 0 && (
-                    <Link
-                        to="/portal/emergencies"
-                        className="inline-flex items-center gap-2 bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold px-3 py-1.5 rounded-full animate-pulse hover:bg-rose-100 transition-colors"
+                <div className="flex items-center gap-2 flex-wrap">
+                    {/* Daily reminder button */}
+                    <button
+                        onClick={handleSendReminders}
+                        disabled={reminderState === 'sending'}
+                        className={`inline-flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-full border transition-colors disabled:cursor-not-allowed
+                            ${reminderState === 'success'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                : reminderState === 'error'
+                                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                                : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'}`}
                     >
-                        <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
-                        {openEmergencies} Open Emergency Alert{openEmergencies !== 1 ? 's' : ''}
-                    </Link>
-                )}
+                        {reminderState === 'sending' && <Loader2 className="w-3 h-3 animate-spin" />}
+                        {reminderState === 'success' && <CheckCircle2 className="w-3 h-3" />}
+                        {reminderState === 'error'   && <AlertCircle  className="w-3 h-3" />}
+                        {reminderState === 'idle'    && <Mail          className="w-3 h-3" />}
+                        {reminderState === 'sending' ? 'Sending…'
+                            : reminderState === 'success' ? reminderMessage || 'Reminders sent!'
+                            : reminderState === 'error'   ? 'Failed — retry?'
+                            : 'Send Daily Reminders'}
+                    </button>
+
+                    {openEmergencies > 0 && (
+                        <Link
+                            to="/portal/emergencies"
+                            className="inline-flex items-center gap-2 bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold px-3 py-1.5 rounded-full animate-pulse hover:bg-rose-100 transition-colors"
+                        >
+                            <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                            {openEmergencies} Open Emergency Alert{openEmergencies !== 1 ? 's' : ''}
+                        </Link>
+                    )}
+                </div>
             </div>
 
             {/* Error banner */}
