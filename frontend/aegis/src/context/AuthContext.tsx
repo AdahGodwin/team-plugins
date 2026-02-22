@@ -3,10 +3,11 @@ import {
   useContext,
   useState,
   useCallback,
+  useEffect,
   type ReactNode,
 } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearSession, getStoredUser } from "../api/authService";
+import { clearSession, getStoredUser, fetchMe } from "../api/authService";
 import type { AuthResponse } from "../types/auth.types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -34,6 +35,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Initialise from the cookie that was set after login / register
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser());
+
+  /** On mount — if a token exists, hit /me to get fresh user data */
+  useEffect(() => {
+    if (!getStoredUser()) return; // not logged in — skip
+    fetchMe()
+      .then(setUser)
+      .catch(() => {
+        // Token is invalid / expired — clear stale session silently
+        clearSession();
+        setUser(null);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /** Re-reads the cookie — call this right after login() / register() */
   const syncUser = useCallback(() => {
