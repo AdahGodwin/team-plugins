@@ -48,13 +48,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   /** On mount — if a token exists, hit /me to get fresh server-side user data */
   useEffect(() => {
-    if (!getStoredUser()) return; // not logged in — skip
+    const stored = getStoredUser();
+    if (!stored) return;
     fetchMe()
       .then(setUser)
-      .catch(() => {
-        // Token invalid / expired — clear stale session silently
-        clearSession();
-        setUser(null);
+      .catch((err) => {
+        // Only clear session for actual auth failures (401/403).
+        // Transient errors (network, 500, etc.) should NOT log the user out.
+        const status = err?.response?.status;
+        if (status === 401 || status === 403) {
+          clearSession();
+          setUser(null);
+        }
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

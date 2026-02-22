@@ -3,13 +3,13 @@ import Cookies from "js-cookie";
 
 export const COOKIE_OPTS: Cookies.CookieAttributes = {
   expires: 1,          
-  sameSite: "Strict",
+  sameSite: "Lax",
   secure: import.meta.env.PROD, 
 };
 
 export const REFRESH_COOKIE_OPTS: Cookies.CookieAttributes = {
   expires: 7,         
-  sameSite: "Strict",
+  sameSite: "Lax",
   secure: import.meta.env.PROD,
 };
 
@@ -36,11 +36,19 @@ client.interceptors.request.use(
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      Cookies.remove("aegis-token");
-      Cookies.remove("aegis-refresh");
-      Cookies.remove("aegis-user");
-      window.location.href = "/auth";
+    const status = error.response?.status;
+    const url: string = error.config?.url ?? "";
+    if (status === 401) {
+      // Only force-logout on pure auth endpoints (login/refresh).
+      // 401s from business-logic routes (e.g. wrong role on /api/admin/*)
+      // should NOT clear the session — let the page handle the error itself.
+      const isAuthEndpoint = url.includes("/api/auth/");
+      if (isAuthEndpoint && !url.includes("/api/auth/me")) {
+        Cookies.remove("aegis-token");
+        Cookies.remove("aegis-refresh");
+        Cookies.remove("aegis-user");
+        window.location.href = "/auth";
+      }
     }
     return Promise.reject(error);
   }

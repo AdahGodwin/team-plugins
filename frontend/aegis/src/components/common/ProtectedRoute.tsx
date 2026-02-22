@@ -17,12 +17,10 @@ export default function ProtectedRoute({ role }: Props) {
   const location = useLocation();
 
   if (!isAuthenticated) {
-    // Send the user to /auth and remember where they were trying to go
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   if (role && user?.role !== role) {
-    // Logged in but wrong role (e.g. patient trying to access /portal)
     return <Navigate to="/unauthorized" replace />;
   }
 
