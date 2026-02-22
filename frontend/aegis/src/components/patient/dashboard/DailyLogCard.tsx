@@ -132,7 +132,7 @@ const DailyLogCard = () => {
                     <div className="flex items-center gap-1.5">
                         <span>🔥</span>
                         <p className="text-slate-600 text-xs font-semibold">
-                            Great job, {profile?.firstName || 'Patient'}!
+                            Great job, {profile?.fullName ? profile.fullName.split(' ')[0] : 'Patient'}!
                         </p>
                     </div>
                     <button onClick={reset} className="text-sm text-emerald-600 font-semibold hover:underline">
