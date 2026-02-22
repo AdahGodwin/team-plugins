@@ -37,3 +37,12 @@ STORAGES = {
 
 # --- API KEYS ---
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+
+RENDER = os.environ.get('RENDER') 
+
+if RENDER:
+    DEBUG = False
+    ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME')]
+else:
+    DEBUG = True
+    ALLOWED_HOSTS = []
