@@ -247,7 +247,7 @@ cp .env.example .env.local      # or create manually
 npm run dev
 ```
 
-The API will be available at `http://localhost:3000`.
+The API will be available at `https://new-aegis-backend.vercel.app/`.
 
 ---
 
