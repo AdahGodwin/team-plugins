@@ -4,8 +4,6 @@ import type {
   EmergencyListResponse,
 } from '../types/emergency.types'
 
-// ─── GET /api/emergency — admin list of all emergencies ──────────────────────
-// Accepts optional ?status= filter (PENDING | ACKNOWLEDGED | RESOLVED)
 
 export async function fetchEmergencies(
   status?: string,
@@ -16,14 +14,10 @@ export async function fetchEmergencies(
   return data
 }
 
-// ─── GET /api/emergency/:id — full emergency record ──────────────────────────
-
 export async function fetchEmergency(id: string): Promise<EmergencyRecord> {
   const { data } = await client.get<EmergencyRecord>(`/api/emergency/${id}`)
   return data
 }
-
-// ─── POST /api/emergency/:id/acknowledge ────────────────────────────────────
 
 export async function acknowledgeEmergency(
   id: string,

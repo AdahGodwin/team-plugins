@@ -8,53 +8,35 @@ import type {
   Hospital,
 } from "../types/auth.types";
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 function persistSession(data: AuthResponse) {
   Cookies.set("aegis-token",   data.accessToken,            COOKIE_OPTS);
   Cookies.set("aegis-refresh", data.refreshToken,           REFRESH_COOKIE_OPTS);
   Cookies.set("aegis-user",    JSON.stringify(data.user),   COOKIE_OPTS);
 }
 
-/** Remove all session cookies on logout */
 export function clearSession() {
   Cookies.remove("aegis-token");
   Cookies.remove("aegis-refresh");
   Cookies.remove("aegis-user");
 }
 
-/** Read the stored user object from cookie (returns null if not logged in) */
 export function getStoredUser(): AuthResponse["user"] | null {
   const raw = Cookies.get("aegis-user");
   return raw ? JSON.parse(raw) : null;
 }
 
-// ─── Auth Service Functions ───────────────────────────────────────────────────
-
-/**
- * POST /api/auth/login
- * Logs the user in and persists the session to cookies.
- */
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
   const { data } = await client.post<AuthResponse>("/api/auth/login", payload);
   persistSession(data);
   return data;
 }
 
-/**
- * POST /api/auth/register
- * Registers a new patient and persists the session to cookies.
- */
 export async function register(payload: RegisterPayload): Promise<AuthResponse> {
   const { data } = await client.post<AuthResponse>("/api/auth/register", payload);
   persistSession(data);
   return data;
 }
 
-/**
- * POST /api/auth/refresh
- * Uses the stored refresh token cookie to get a new access token.
- */
 export async function refreshToken(): Promise<string> {
   const refresh = Cookies.get("aegis-refresh");
   const { data } = await client.post<{ accessToken: string }>("/api/auth/refresh", {
@@ -64,21 +46,12 @@ export async function refreshToken(): Promise<string> {
   return data.accessToken;
 }
 
-/**
- * GET /me
- * Fetches the currently authenticated user from the server.
- * Updates the aegis-user cookie with fresh data.
- */
 export async function fetchMe(): Promise<AuthUser> {
   const { data } = await client.get<AuthUser>("/me");
   Cookies.set("aegis-user", JSON.stringify(data), COOKIE_OPTS);
   return data;
 }
 
-/**
- * GET /hospitals
- * Returns the list of registered hospitals for the registration select field.
- */
 export async function fetchHospitals(): Promise<Hospital[]> {
   const { data } = await client.get<Hospital[]>("/hospitals");
   return data;
@@ -102,10 +75,6 @@ const SEED_ADMIN_PAYLOAD = {
   registrationNo:  "NHS-REG-00123",
 };
 
-/**
- * POST /api/admin/register  (dev-only seed)
- * Creates the seed admin and persists the session so you land straight on /portal.
- */
 export async function seedAdmin(): Promise<AuthResponse> {
   const { data } = await client.post<AuthResponse>("/api/admin/register", SEED_ADMIN_PAYLOAD);
   persistSession(data);
