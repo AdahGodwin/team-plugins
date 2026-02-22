@@ -39,7 +39,8 @@ STORAGES = {
 GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
 RENDER = os.environ.get('RENDER') 
-
+ROOT_URLCONF = 'config.urls'
+WSGI_APPLICATION = 'config.wsgi.application'
 if RENDER:
     DEBUG = False
     ALLOWED_HOSTS = [os.environ.get('RENDER_EXTERNAL_HOSTNAME')]
