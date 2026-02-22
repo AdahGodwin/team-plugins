@@ -1,14 +1,20 @@
-import requests
+import os
+import json
+import google.generativeai as genai
 from datetime import date
 from rest_framework import status
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import MedicalRecord
-from .serializers import VitalSignLogSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
+from .models import MedicalRecord
+from .serializers import VitalSignLogSerializer, VitalHistorySerializer, VitalSignLog
 from apps.patients.models import Patient
 from apps.patients.serializers import PatientProfileSerializer
+
+# Configure your API key
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY"))
 
 class PredictHealthOutcomeView(APIView):
     # Ensure only logged-in patients with a valid token can access this
@@ -40,43 +46,77 @@ class PredictHealthOutcomeView(APIView):
         # Subtract 1 year if today's month/day is before the birth month/day
         age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
-        # 4. Construct the exact JSON Payload for the Flask ML Model
-        ml_payload = {
-            "age": age,
-            "hypertension": medical_record.hypertension,
-            "heart_disease": medical_record.heart_disease,
-            "avg_glucose_level": medical_record.avg_glucose_level,
-            "bmi": medical_record.bmi,
-            "ever_married_Yes": medical_record.ever_married_Yes,
-            "work_type_Private": medical_record.work_type_Private,
-            "Residence_type_Urban": medical_record.Residence_type_Urban,
-            "smoking_status_smokes": medical_record.smoking_status_smokes,
-            "systolic_bp": vital_log.systolic_bp,
-            "diastolic_bp": vital_log.diastolic_bp,
-            "heart_rate": vital_log.heart_rate,
-            "daily_steps": vital_log.daily_steps,
-            "sleep_hours": vital_log.sleep_hours
-        }
+        # 4. Initialize Gemini Model
+        model = genai.GenerativeModel('gemini-1.5-flash')
 
-        # 5. Send the payload to the Flask Machine Learning API
-        flask_url = "http://127.0.0.1:5000/predict"
+        # 5. Construct a prompt explicitly asking for stroke prevention steps
+        prompt = f"""
+        Act as a medical data analyst. Assess the potential risk for a stroke based on the patient data below.
+        
+        Patient Baseline Data:
+        - Age: {age}
+        - Gender: {patient_profile.gender}
+        - Hypertension: {medical_record.hypertension}
+        - Heart Disease: {medical_record.heart_disease}
+        - Smoking Status (Smokes): {medical_record.smoking_status_smokes}        - Average Glucose Level: {medical_record.avg_glucose_level} mg/dL
+        - BMI: {medical_record.bmi}
+
+        Newly Submitted Vitals:
+        - Systolic BP: {vital_log.systolic_bp}
+        - Diastolic BP: {vital_log.diastolic_bp}
+        - Heart Rate: {vital_log.heart_rate}
+        - Daily Steps: {vital_log.daily_steps}
+        - Sleep Hours: {vital_log.sleep_hours}
+
+        You MUST respond ONLY with a valid JSON object using the following exact structure. 
+        Focus the recommendations heavily on personalized stroke prevention based on the patient's specific risk factors:
+        {{
+            "risk_score": "Low", // strictly one of: "Low", "Moderate", "High"
+            "justification": "A 1-2 sentence explanation of the score based on the vitals.",
+            "stroke_prevention_steps": [
+                "Specific, actionable lifestyle or medical step 1 to prevent stroke", 
+                "Specific, actionable step 2"
+            ]
+        }}
+        """
+
+        # 6. Generate structured JSON response from Gemini
         try:
-            # timeout=5 prevents your Django app from hanging if the Flask server is down
-            ml_response = requests.post(flask_url, json=ml_payload, timeout=5)
-            ml_response.raise_for_status() # Catches 4xx or 5xx HTTP errors from Flask
-            prediction_data = ml_response.json()
-        except requests.exceptions.RequestException as e:
+            gemini_response = model.generate_content(
+                prompt,
+                generation_config=genai.GenerationConfig(response_mime_type="application/json")
+            )
+            
+            # Parse the AI's JSON string into a Python dictionary
+            ai_analysis = json.loads(gemini_response.text)
+            
+        except json.JSONDecodeError:
             return Response(
-                {"error": "Machine Learning service is currently unavailable.", "details": str(e)}, 
+                {"error": "Failed to parse AI analysis. Please try again."}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except Exception as e:
+            return Response(
+                {"error": "AI analysis service is currently unavailable.", "details": str(e)}, 
                 status=status.HTTP_503_SERVICE_UNAVAILABLE
             )
 
-        # 6. Return the combined result to the React frontend
-        return Response({
+        # 7. Build a smart status report based on the risk score
+        risk_score = ai_analysis.get("risk_score", "Unknown")
+        
+        status_report = {
             "message": "Vitals successfully submitted and analyzed.",
-            "prediction": prediction_data,
-            "payload_sent_to_ml": ml_payload  # Useful for debugging your Flask endpoint
-        }, status=status.HTTP_201_CREATED)
+            "risk_level": risk_score,
+            "requires_doctor_visit": risk_score in ["Moderate", "High"],
+            "is_urgent": risk_score == "High",
+            "analysis_details": {
+                "justification": ai_analysis.get("justification"),
+                "stroke_prevention_steps": ai_analysis.get("stroke_prevention_steps", [])
+            }
+        }
+
+        return Response(status_report, status=status.HTTP_201_CREATED)
+
 
 class PatientVitalHistoryView(APIView):
     """ Allows a logged-in patient to see their own history """
@@ -95,9 +135,12 @@ class PatientVitalHistoryView(APIView):
 
 class AdminPatientDetailView(APIView):
     """ Allows hospital staff to see any patient's full file """
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAdminUser] # Strictly enforces is_staff=True
 
     def get(self, request, patient_id):
+        # Log the access (Optional: for hospital auditing)
+        print(f"Hospital Admin {request.user.username} is accessing Patient {patient_id}")
+
         # 1. Find the specific patient
         patient = get_object_or_404(Patient, id=patient_id)
         
@@ -108,8 +151,9 @@ class AdminPatientDetailView(APIView):
         logs = VitalSignLog.objects.filter(patient=patient)
         history_serializer = VitalHistorySerializer(logs, many=True)
         
-        # 4. Return everything in one comprehensive package
+        # 4. Return the comprehensive package
         return Response({
+            "accessed_by": request.user.get_full_name(),
             "patient_profile": profile_serializer.data,
             "vital_history": history_serializer.data
         }, status=status.HTTP_200_OK)
