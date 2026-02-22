@@ -147,13 +147,15 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
             onChange={update("password")}
             error={errors.password}
             rightElement={
-              <button
-                type="button"
+              <span
+                role="button"
+                tabIndex={0}
                 onClick={() => setShowPassword((p) => !p)}
-                className="text-slate-400 hover:text-slate-600"
+                onKeyDown={(e) => e.key === 'Enter' && setShowPassword((p) => !p)}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+              </span>
             }
           />
           <div className="flex justify-end">

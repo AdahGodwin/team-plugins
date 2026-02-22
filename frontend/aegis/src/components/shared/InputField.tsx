@@ -49,9 +49,9 @@ export default function InputField({
             }`}
         />
         {rightElement && (
-          <button type="button" className="absolute right-3.5 text-slate-400 transition hover:text-slate-600">
+          <span className="absolute right-3.5 flex items-center">
             {rightElement}
-          </button>
+          </span>
         )}
         {success && !rightElement && (
           <CheckCircle2 className="absolute right-3.5 text-emerald-500" size={16} />

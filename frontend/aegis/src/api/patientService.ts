@@ -17,28 +17,38 @@ export interface FetchPatientsParams {
   limit?: number
 }
 
+interface ApiListEnvelope {
+  success: boolean
+  data: ApiPatientListResponse
+}
+
 export async function fetchPatients(
   params: FetchPatientsParams = {},
 ): Promise<ApiPatientListResponse> {
-  const { data } = await client.get<ApiPatientListResponse>(
+  const { data } = await client.get<ApiListEnvelope>(
     '/api/admin/patients',
     { params },
   )
-  return data
+  return data.data
+}
+
+interface ApiItemEnvelope {
+  success: boolean
+  data: ApiPatient
 }
 
 export async function fetchPatient(id: string): Promise<ApiPatient> {
-  const { data } = await client.get<ApiPatient>(`/api/admin/patients/${id}`)
-  return data
+  const { data } = await client.get<ApiItemEnvelope>(`/api/admin/patients/${id}`)
+  return data.data
 }
 
 export async function patchPatient(
   id: string,
   payload: PatchPatientPayload,
 ): Promise<ApiPatient> {
-  const { data } = await client.patch<ApiPatient>(
+  const { data } = await client.patch<ApiItemEnvelope>(
     `/api/admin/patients/${id}`,
     payload,
   )
-  return data
+  return data.data
 }

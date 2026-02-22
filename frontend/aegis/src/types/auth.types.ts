@@ -33,6 +33,7 @@ export interface AuthUser {
   id: string;
   patientId?: string;   // present for patient role
   adminId?: string;     // present for admin role
+  hospitalId?: string;  // present for both roles — scopes data to the linked hospital
   fullName: string;
   email: string;
   role: "patient" | "admin";

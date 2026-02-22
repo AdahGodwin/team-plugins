@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import { connectDB } from '@/lib/db';
 import { signAccessToken, signRefreshToken } from '@/lib/auth';
 import { successResponse, errorResponse, validationErrorResponse, notFoundResponse } from '@/lib/response';
@@ -50,12 +51,15 @@ export async function POST(req: NextRequest) {
         accessToken,
         refreshToken,
         user: {
-          id:        userId,
+          id:          userId,
           adminId,
-          fullName:  `${admin.title} ${user.firstName} ${user.lastName}`,
-          email:     user.email,
-          role:      user.role,
-          isVerified: admin.isVerified,
+          hospitalId:  admin.hospitalId
+            ? (admin.hospitalId as mongoose.Types.ObjectId).toString()
+            : null,
+          fullName:    `${admin.title} ${user.firstName} ${user.lastName}`,
+          email:       user.email,
+          role:        user.role,
+          isVerified:  admin.isVerified,
           hospitalName: admin.hospitalName,
           specialty:    admin.specialty,
           jobTitle:     admin.jobTitle,
@@ -79,11 +83,14 @@ export async function POST(req: NextRequest) {
       accessToken,
       refreshToken,
       user: {
-        id:       userId,
+        id:         userId,
         patientId,
-        fullName: `${user.firstName} ${user.lastName}`,
-        email:    user.email,
-        role:     user.role,
+        hospitalId: patient.hospitalId
+          ? (patient.hospitalId as mongoose.Types.ObjectId).toString()
+          : null,
+        fullName:   `${user.firstName} ${user.lastName}`,
+        email:      user.email,
+        role:       user.role,
       },
     });
   } catch (err) {

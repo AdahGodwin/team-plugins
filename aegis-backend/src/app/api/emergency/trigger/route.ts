@@ -44,16 +44,15 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
     }
 
     const user = await User.findById(patient.userId)
-      .select('firstName lastName')
+      .select('firstName lastName phoneNumber')
       .lean();
-    const patientName = user
-      ? `${user.firstName} ${user.lastName}`
-      : 'Unknown Patient';
+    const patientName  = user ? `${user.firstName} ${user.lastName}` : 'Unknown Patient';
+    const patientPhone = (user as any)?.phoneNumber ?? patient.phoneNumber ?? undefined;
 
     let clinicName: string | undefined;
     if (patient.hospitalId) {
       const hospital = await Hospital.findById(patient.hospitalId)
-        .select('name')
+        .select('name phone')
         .lean<IHospital>();
       clinicName = hospital?.name;
     }
@@ -61,9 +60,11 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
     const emergency = createEmergency({
       patientId,
       patientName,
+      patientPhone,
       reportedSymptoms: symptoms,
       message:          message || '',
       caregiverName:    patient.caregiverName,
+      caregiverPhone:   patient.caregiverPhone,
       clinicName,
     });
 
@@ -81,7 +82,7 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
         success:     true,
         emergencyId: emergency.id,
         message:     alertMessage,
-        timestamp:   emergency.timestamp,
+        triggeredAt: emergency.triggeredAt,
         nextSteps: [
           'Contact emergency services immediately if symptoms are severe.',
           'Remain calm and wait for assistance.',

@@ -47,14 +47,14 @@ export async function refreshToken(): Promise<string> {
 }
 
 export async function fetchMe(): Promise<AuthUser> {
-  const { data } = await client.get<AuthUser>("/me");
-  Cookies.set("aegis-user", JSON.stringify(data), COOKIE_OPTS);
-  return data;
+  const { data } = await client.get<{ success: boolean; data: AuthUser }>("/api/auth/me");
+  Cookies.set("aegis-user", JSON.stringify(data.data), COOKIE_OPTS);
+  return data.data;
 }
 
 export async function fetchHospitals(): Promise<Hospital[]> {
-  const { data } = await client.get<Hospital[]>("/hospitals");
-  return data;
+  const { data } = await client.get<{ success: boolean; data: Hospital[] }>("/api/hospitals");
+  return data.data;
 }
 
 

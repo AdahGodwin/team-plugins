@@ -147,7 +147,7 @@ export default function PatientList() {
                                             <td className="px-4 py-3.5">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                                                        {patient.firstName[0]}
+                                                        {patient.firstName?.[0] ?? '?'}
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="font-semibold text-slate-900 truncate">

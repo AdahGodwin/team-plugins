@@ -72,11 +72,14 @@ export async function POST(req: NextRequest) {
         accessToken,
         refreshToken,
         user: {
-          id:       userId,
+          id:         userId,
           patientId,
-          fullName: `${user.firstName} ${user.lastName}`,
-          email:    user.email,
-          role:     user.role,
+          hospitalId: patient.hospitalId
+            ? (patient.hospitalId as mongoose.Types.ObjectId).toString()
+            : null,
+          fullName:   `${user.firstName} ${user.lastName}`,
+          email:      user.email,
+          role:       user.role,
         },
       },
       201,
