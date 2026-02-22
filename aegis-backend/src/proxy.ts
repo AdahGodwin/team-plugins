@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 const ALLOWED_ORIGINS = new Set([
   'http://localhost:5173',   // Vite dev frontend
-  'http://localhost:3000',   // Next.js itself
+  'https://new-aegis-backend.vercel.app/',   // Next.js itself
   process.env.NEXT_PUBLIC_APP_URL ?? '',
   process.env.FRONTEND_URL  ?? '',
 ].filter(Boolean));
