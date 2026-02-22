@@ -1,7 +1,10 @@
 import { useState } from "react";
-import { Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, AlertCircle } from "lucide-react";
+import { Lock, Mail, Eye, EyeOff, ShieldCheck, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import InputField from "../shared/InputField";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { login } from "../../api/authService";
+import { useAuth } from "../../context/AuthContext";
 
 interface Props {
   onGoRegister: () => void;
@@ -10,9 +13,13 @@ interface Props {
 
 export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
   const { t } = useLanguage();
+  const { syncUser } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Partial<typeof form>>({});
+  const [apiError, setApiError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   const update = (field: keyof typeof form) =>
@@ -28,11 +35,30 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
     return e;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
-    setSubmitted(true);
+    setApiError("");
+    setLoading(true);
+    try {
+      const data = await login({ email: form.email, password: form.password });
+      syncUser(); // sync AuthContext so ProtectedRoute sees the user immediately
+      setSubmitted(true);
+      // Role-based redirect
+      setTimeout(() => {
+        if (data.user.role === "admin") navigate("/portal");
+        else navigate("/dashboard");
+      }, 1200);
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.message ??
+        err.response?.data?.error ??
+        "Login failed. Please check your credentials.";
+      setApiError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -72,6 +98,15 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+
+        {/* API Error Banner */}
+        {apiError && (
+          <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5">
+            <AlertCircle size={15} className="mt-0.5 shrink-0 text-red-500" />
+            <p className="text-sm font-medium text-red-600">{apiError}</p>
+          </div>
+        )}
+
         <InputField
           label={t('auth.email' as any)} type="email"
           placeholder="e.g. margaret@example.com"
@@ -108,10 +143,20 @@ export default function LoginForm({ onGoRegister, onGoForgot }: Props) {
 
         <button
           type="submit"
-          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] sm:rounded-2xl sm:py-4"
+          disabled={loading}
+          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed sm:rounded-2xl sm:py-4"
         >
-          {t('auth.login' as any)}
-          <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+          {loading ? (
+            <>
+              <Loader2 size={17} className="animate-spin" />
+              Signing in…
+            </>
+          ) : (
+            <>
+              {t('auth.login' as any)}
+              <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </button>
 
         <p className="text-center text-sm text-slate-500">

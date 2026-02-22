@@ -1,12 +1,14 @@
 import { useState } from "react";
 import {
   Lock, User, Mail, Phone, Eye, EyeOff,
-  Heart, CheckCircle2, AlertCircle, ArrowRight, Stethoscope,
+  Heart, CheckCircle2, AlertCircle, ArrowRight, Stethoscope, Loader2,
 } from "lucide-react";
 import PasswordStrength from "../shared/PasswordStrength";
 import InputField from "../shared/InputField";
 import SectionHeading from "../shared/SectionHeading";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { register } from "../../api/authService";
+import { useAuth } from "../../context/AuthContext";
 
 interface Props {
   onGoLogin: () => void;
@@ -14,11 +16,14 @@ interface Props {
 
 export default function RegisterForm({ onGoLogin }: Props) {
   const { t } = useLanguage();
+  const { syncUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [consentHealth, setConsentHealth] = useState(false);
   const [consentTerms, setConsentTerms] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const [form, setForm] = useState({
     fullName: "", email: "", phone: "",
@@ -51,12 +56,43 @@ export default function RegisterForm({ onGoLogin }: Props) {
     return e;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
-    setSubmitted(true);
+    setApiError("");
+    setLoading(true);
+
+    // Split fullName into firstName / lastName
+    const nameParts = form.fullName.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || nameParts[0];
+
+    try {
+      await register({
+        firstName,
+        lastName,
+        email: form.email,
+        password: form.password,
+        phoneNumber: form.phone,
+        kinName: form.kinName,
+        kinPhone: form.kinPhone,
+        kinEmail: form.kinEmail,
+        consentHealth,
+        consentTerms,
+      });
+      syncUser(); // sync AuthContext so ProtectedRoute sees the new user
+      setSubmitted(true);
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.message ??
+        err.response?.data?.error ??
+        "Registration failed. Please try again.";
+      setApiError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -104,6 +140,14 @@ export default function RegisterForm({ onGoLogin }: Props) {
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+
+        {/* API Error Banner */}
+        {apiError && (
+          <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5">
+            <AlertCircle size={15} className="mt-0.5 shrink-0 text-red-500" />
+            <p className="text-sm font-medium text-red-600">{apiError}</p>
+          </div>
+        )}
 
         <div className="flex flex-col gap-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100 sm:rounded-2xl">
           <SectionHeading step="01" color="bg-emerald-500"
@@ -242,10 +286,20 @@ export default function RegisterForm({ onGoLogin }: Props) {
         </div>
 
         <button type="submit"
-          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] sm:rounded-2xl sm:py-4"
+          disabled={loading}
+          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed sm:rounded-2xl sm:py-4"
         >
-          {t('auth.createAccountTitle' as any)}
-          <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+          {loading ? (
+            <>
+              <Loader2 size={17} className="animate-spin" />
+              Creating account…
+            </>
+          ) : (
+            <>
+              {t('auth.createAccountTitle' as any)}
+              <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </button>
 
         <p className="text-center text-sm text-slate-500">

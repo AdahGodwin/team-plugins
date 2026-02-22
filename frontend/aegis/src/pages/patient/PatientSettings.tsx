@@ -9,13 +9,13 @@ import {
     ChevronRight, Globe,
     LogOut, HelpCircle, Heart,
 } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 import LogoutModal from '../../components/auth/modal/LogoutModal'
+import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../i18n/LanguageContext'
 
 export default function PatientSettings() {
     const { t, language } = useLanguage()
-    const navigate = useNavigate()
+    const { logout } = useAuth()
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [showLogout, setShowLogout] = useState(false)
     const unreadCount = MOCK_NOTIFICATIONS.length
@@ -177,7 +177,7 @@ export default function PatientSettings() {
                         </div>
                     ))}
 
-                    {/* Logout button */}
+                    {/*  button */}
                     <button
                         onClick={() => setShowLogout(true)}
                         className="w-full flex items-center gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-4 bg-white border border-slate-200 rounded-2xl shadow-sm hover:bg-rose-50 hover:border-rose-100 transition-colors group text-left"
@@ -205,7 +205,7 @@ export default function PatientSettings() {
             {/* Logout modal */}
             {showLogout && (
                 <LogoutModal
-                    onConfirm={() => { setShowLogout(false); navigate('/auth/login') }}
+                    onConfirm={() => { setShowLogout(false); logout() }}
                     onCancel={() => setShowLogout(false)}
                 />
             )}
