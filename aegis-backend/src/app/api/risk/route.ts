@@ -20,13 +20,11 @@ async function handler(req: AuthenticatedRequest) {
       return notFoundResponse('Patient');
     }
 
-    // Get the two most recent risk scores to determine trend
     const recentScores = await RiskScore.find({ patientId: patientObjId })
       .sort({ calculatedAt: -1 })
       .limit(2)
       .lean<IRiskScore[]>();
 
-    // If no score exists, calculate one on-the-fly
     if (recentScores.length === 0) {
       const latestVital = await VitalLog.findOne({ patientId: patientObjId })
         .sort({ loggedAt: -1 })

@@ -15,9 +15,6 @@ const triggerSchema = z.object({
   message:   z.string().optional().default(''),
 });
 
-// ── POST /api/emergency/trigger ───────────────────────────────────────────────
-// Auth required — patient triggers their own SOS.
-// The token's patientId must match the requested patientId.
 async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
   try {
     await connectDB();
@@ -30,8 +27,6 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
 
     const { patientId, symptoms, message } = parsed.data;
 
-    // ── Security: patient can only trigger their own SOS ─────────────────────
-    // Admins can trigger on behalf of any patient in their hospital (future use).
     if (req.user.role === 'patient' && req.user.patientId !== patientId) {
       return NextResponse.json(
         { success: false, error: 'You can only trigger an SOS for your own account.' },
@@ -43,13 +38,11 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
       return errorResponse('Invalid patientId', 400);
     }
 
-    // ── Load patient record ───────────────────────────────────────────────────
     const patient = await Patient.findById(patientId).lean<IPatient>();
     if (!patient) {
       return errorResponse('Patient not found', 404);
     }
 
-    // ── Load user (for name) ──────────────────────────────────────────────────
     const user = await User.findById(patient.userId)
       .select('firstName lastName')
       .lean();
@@ -57,7 +50,6 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
       ? `${user.firstName} ${user.lastName}`
       : 'Unknown Patient';
 
-    // ── Load hospital name (optional) ─────────────────────────────────────────
     let clinicName: string | undefined;
     if (patient.hospitalId) {
       const hospital = await Hospital.findById(patient.hospitalId)
@@ -66,7 +58,6 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
       clinicName = hospital?.name;
     }
 
-    // ── Create emergency record + notifications ───────────────────────────────
     const emergency = createEmergency({
       patientId,
       patientName,
@@ -76,7 +67,6 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
       clinicName,
     });
 
-    // ── Build recipient summary for response message ──────────────────────────
     const recipients: string[] = [];
     if (patient.caregiverName) recipients.push(`caregiver (${patient.caregiverName})`);
     if (clinicName)            recipients.push(`clinic (${clinicName})`);

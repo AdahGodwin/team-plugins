@@ -11,7 +11,6 @@ import Patient, { type IPatient } from '@/models/Patient.model';
 import User from '@/models/User.model';
 import mongoose from 'mongoose';
 
-// GET /api/admin/patients — returns all patients linked to the admin's hospital
 async function handler(req: AuthenticatedRequest) {
   try {
     await connectDB();
@@ -20,7 +19,6 @@ async function handler(req: AuthenticatedRequest) {
       return unauthorizedResponse('Access restricted to admin accounts');
     }
 
-    // req.user.patientId holds the adminId for admin tokens
     const adminId = req.user.patientId;
     const admin = await Admin.findById(adminId).lean<IAdmin>();
     if (!admin) {
@@ -44,7 +42,6 @@ async function handler(req: AuthenticatedRequest) {
       (admin.hospitalId as mongoose.Types.ObjectId).toString(),
     );
 
-    // ── If search term provided, resolve matching userIds first ────────────
     let userIdFilter: mongoose.Types.ObjectId[] | null = null;
     if (search) {
       const regex = new RegExp(search, 'i');
@@ -78,7 +75,6 @@ async function handler(req: AuthenticatedRequest) {
       return successDataResponse({ total, page, limit, patients: [] });
     }
 
-    // Enrich with User name + email
     const enriched = await Promise.all(
       patients.map(async (p) => {
         const user = await User.findById(p.userId)

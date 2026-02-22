@@ -11,7 +11,6 @@ import StatCard from '../../components/admin/StatCard'
 import RiskBadge from '../../components/admin/RiskBadge'
 import type { RiskLevel } from '../../types/patient.types'
 
-// Map backend uppercase risk to the badge's lowercase union
 function toRiskLevel(raw: RecentActivityItem['riskLevel']): RiskLevel {
     const map: Record<RecentActivityItem['riskLevel'], RiskLevel> = {
         HIGH: 'high',
@@ -21,12 +20,9 @@ function toRiskLevel(raw: RecentActivityItem['riskLevel']): RiskLevel {
     return map[raw]
 }
 
-// ─── Loading skeleton ─────────────────────────────────────────────────────────
 function SkeletonBar({ w = 'w-full' }: { w?: string }) {
     return <div className={`h-3 bg-slate-100 rounded-full animate-pulse ${w}`} />
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function AdminOverview() {
     const [data, setData] = useState<DashboardData | null>(null)
@@ -55,7 +51,6 @@ export default function AdminOverview() {
 
     return (
         <div className="space-y-8">
-            {/* Page header */}
             <div className="flex items-start justify-between gap-4 flex-wrap">
                 <div>
                     <h1 className="text-2xl font-extrabold text-slate-900">Dashboard Overview</h1>
@@ -67,7 +62,6 @@ export default function AdminOverview() {
                     </p>
                 </div>
 
-                {/* Open emergencies badge */}
                 {openEmergencies > 0 && (
                     <Link
                         to="/portal/emergencies"

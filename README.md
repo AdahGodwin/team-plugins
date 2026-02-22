@@ -1,6 +1,6 @@
 # 🛡️ Aegis — Stroke Prevention Patient Dashboard
 
-Aegis is a full-stack health monitoring platform designed to help at-risk patients track, understand, and reduce their stroke risk. It combines a responsive React frontend with a Django REST backend and an AI-powered vital-sign analysis engine.
+Aegis is a full-stack health monitoring platform designed to help at-risk patients track, understand, and reduce their stroke risk. It combines a responsive React frontend with a Next.js API backend, a MongoDB database, and an on-device risk scoring engine.
 
 > Built for the Nigerian context — supports **English**, **Yoruba**, **Hausa**, and **Igbo** with culturally adapted translations and accessible design for elderly users.
 
@@ -34,16 +34,18 @@ Aegis is a full-stack health monitoring platform designed to help at-risk patien
 - **Settings** — Profile card with stats, categorised settings rows, logout, app version footer
 
 ### Admin Portal
-- Patient list and search
-- Emergency cases dashboard
-- Per-patient clinical record viewer and editor
+- Dashboard overview with live stats, risk distribution and recent activity feed (powered by `GET /api/admin/dashboard`)
+- Patient list with search and pagination
+- Per-patient clinical record viewer and editor with real PATCH support
+- Emergency cases — SOS alerts with caregiver info, notification log, and **Acknowledge** action
 - Risk badge display
 - Caretaker notification modal
 
 ### Auth
-- Register and login with DRF Token authentication
-- Role-based redirect (patient → `/patient/dashboard`, admin → `/admin`)
-- Persistent session via `localStorage`
+- Cookie-based JWT authentication (access token `1d`, refresh token `7d`)
+- Role-based redirect (patient → `/dashboard`, admin → `/portal`)
+- Auto-refresh via `POST /api/auth/refresh`
+- Hospital selector on registration — patients linked to a clinic at sign-up
 
 ### UX
 - Animated route loader (arc spinner + bouncing dots) on every page transition
@@ -59,23 +61,24 @@ Aegis is a full-stack health monitoring platform designed to help at-risk patien
 | Technology | Version | Purpose |
 |---|---|---|
 | React | 19 | UI framework |
-| TypeScript | 5.9 | Type safety |
+| TypeScript | 5 | Type safety |
 | Tailwind CSS | 4.2 | Utility-first styling |
 | React Router | 7 | Client-side routing |
 | Vite | 7 | Build tool and dev server |
+| Axios | 1.13 | HTTP client (auto-injects auth cookie) |
+| js-cookie | 3 | Cookie management |
 | Lucide React | 0.575 | Icon library |
 
 ### Backend
 | Technology | Version | Purpose |
 |---|---|---|
-| Django | 6.0 | Web framework |
-| Django REST Framework | 3.16 | REST API |
-| DRF Token Auth | built-in | API authentication |
-| Google Generative AI | 0.8.6 | Gemini vitals analysis |
-| APScheduler | 3.11 | Background task scheduling |
-| WhiteNoise | 6.11 | Static file serving |
-| Gunicorn | 25.1 | Production WSGI server |
-| dj-database-url | 3.1 | Database URL parsing |
+| Next.js | 16 | API route server (App Router) |
+| TypeScript | 5 | Type safety |
+| MongoDB + Mongoose | 8.10 | Database and ODM |
+| jose | 5.9 | JWT signing and verification (HS256) |
+| bcryptjs | 2.4 | Password hashing |
+| Zod | 3.24 | Request validation |
+| Nodemailer | 6.9 | Email notifications |
 
 ---
 
@@ -84,65 +87,119 @@ Aegis is a full-stack health monitoring platform designed to help at-risk patien
 ```
 team-plugins/
 ├── README.md
-├── backend/
-│   ├── manage.py
-│   ├── requirements.txt
-│   ├── render.yaml                  # Render deployment config
-│   ├── config/
-│   │   ├── settings.py
-│   │   ├── urls.py                  # Root URL conf
-│   │   ├── asgi.py
-│   │   └── wsgi.py
-│   └── apps/
-│       ├── patients/                # Auth, registration, patient profile
-│       │   ├── models.py            # User + Patient models
-│       │   ├── serializers.py
-│       │   ├── views.py             # Register, Login, Dashboard
-│       │   └── urls.py
-│       └── medical/                 # Vitals, AI analysis, admin view
-│           ├── models.py            # MedicalRecord, VitalSignLog
-│           ├── serializers.py
-│           ├── views.py             # PredictHealthOutcome, VitalHistory, AdminDetail
-│           ├── scheduler.py         # APScheduler periodic tasks
-│           └── urls.py
+├── aegis-backend/                        # Next.js API server
+│   ├── next.config.ts
+│   ├── package.json
+│   └── src/
+│       ├── lib/
+│       │   ├── auth.ts                   # signAccessToken, signRefreshToken, verify*
+│       │   ├── db.ts                     # Mongoose connection with hot-reload cache
+│       │   ├── middleware.ts             # requireAuth(), requireAdmin() helpers
+│       │   ├── riskCalculator.ts         # Score engine (BP + adherence + risk factors)
+│       │   ├── emergencyStore.ts         # In-memory SOS store (globalThis, survives hot-reload)
+│       │   └── response.ts              # Typed JSON response helpers
+│       ├── models/
+│       │   ├── User.model.ts
+│       │   ├── Patient.model.ts
+│       │   ├── Admin.model.ts
+│       │   ├── Hospital.model.ts
+│       │   ├── VitalLog.model.ts
+│       │   ├── RiskScore.model.ts
+│       │   ├── Medication.model.ts
+│       │   ├── DoseLog.model.ts
+│       │   └── Notification.model.ts
+│       ├── schemas/                      # Zod validation schemas
+│       │   ├── auth.schema.ts
+│       │   ├── admin.schema.ts
+│       │   ├── vitals.schema.ts
+│       │   └── medication.schema.ts
+│       └── app/api/
+│           ├── auth/
+│           │   ├── register/route.ts     # POST — create patient account
+│           │   ├── login/route.ts        # POST — returns access + refresh tokens
+│           │   ├── logout/route.ts       # POST — clears cookies
+│           │   ├── refresh/route.ts      # POST — rotates access token
+│           │   └── me/route.ts           # GET  — returns full user profile
+│           ├── hospitals/route.ts        # GET  — list all hospitals (public)
+│           ├── patient/
+│           │   ├── overview/route.ts     # GET  — patient dashboard data
+│           │   └── profile/route.ts      # GET/PATCH — patient profile
+│           ├── vitals/
+│           │   ├── route.ts              # POST — submit vitals + trigger risk score
+│           │   └── latest/route.ts       # GET  — most recent vital log
+│           ├── risk/route.ts             # GET  — patient risk history
+│           ├── medications/…             # GET, POST, PATCH medication routes
+│           ├── notifications/…           # GET, PATCH notification routes
+│           ├── emergency/
+│           │   ├── trigger/route.ts      # POST — patient SOS trigger
+│           │   └── [id]/
+│           │       ├── route.ts          # GET  — full emergency record
+│           │       └── acknowledge/route.ts  # POST — admin acknowledge
+│           └── admin/
+│               ├── register/route.ts     # POST — create admin account
+│               ├── dashboard/route.ts    # GET  — overview stats + activity feed
+│               ├── patients/
+│               │   ├── route.ts          # GET  — paginated patient list (?search, ?page, ?limit)
+│               │   └── [id]/route.ts     # GET/PATCH — patient detail + update
+│               └── me/route.ts           # GET  — admin profile
 └── frontend/
     └── aegis/
         ├── index.html
         ├── vite.config.ts
         ├── package.json
         └── src/
-            ├── main.tsx             # App entry — wraps providers
-            ├── App.tsx              # Routes + RouteLoader
+            ├── main.tsx                  # App entry — wraps providers
+            ├── App.tsx                   # Routes + ProtectedRoute + RouteLoader
+            ├── api/
+            │   ├── client.ts             # Axios instance — auto-injects Bearer token
+            │   ├── authService.ts        # login, register, fetchMe, fetchHospitals, seedAdmin
+            │   ├── patientService.ts     # fetchPatients, fetchPatient, patchPatient, fetchDashboard
+            │   └── emergencyService.ts   # fetchEmergencies, fetchEmergency, acknowledgeEmergency
+            ├── types/
+            │   ├── auth.types.ts         # AuthUser, Hospital, RegisterPayload
+            │   ├── patient.types.ts      # ApiPatient, PatchPatientPayload, ApiPatientListResponse
+            │   ├── emergency.types.ts    # EmergencyRecord, EmergencyStatus, EmergencyNotification
+            │   └── dashboard.types.ts    # DashboardData, RecentActivityItem, RiskDistribution
+            ├── context/
+            │   └── AuthContext.tsx       # useAuth() — user, syncUser(), logout()
             ├── accessibility/
-            │   ├── AccessibilityContext.tsx   # Text size + TTS
+            │   ├── AccessibilityContext.tsx
             │   └── accessibilityTypes.ts
             ├── i18n/
             │   ├── LanguageContext.tsx
             │   ├── languages.ts
-            │   ├── index.ts                   # t() helper
+            │   ├── index.ts              # t(key, locale) helper
             │   └── translations/
             │       ├── en.ts
-            │       ├── yo.ts                  # Yoruba
-            │       ├── ha.ts                  # Hausa
-            │       └── ig.ts                  # Igbo
+            │       ├── yo.ts             # Yoruba
+            │       ├── ha.ts             # Hausa
+            │       └── ig.ts             # Igbo
             ├── components/
-            │   ├── admin/           # Admin UI components
-            │   ├── auth/            # LoginForm, RegisterForm, ForgotPasswordForm, LogoutModal
-            │   ├── common/          # PageLoader, RouteLoader, AccessibilityBar, LanguageSwitcher, SpeakButton
-            │   ├── home/            # Landing page sections
+            │   ├── admin/
+            │   ├── auth/                 # LoginForm, RegisterForm (with hospital select), LogoutModal
+            │   ├── common/               # PageLoader, RouteLoader, AccessibilityBar, LanguageSwitcher
+            │   ├── home/
             │   ├── patient/
-            │   │   ├── chat/        # ChatWindow, ChatInput, SafetyAlert, TopicCards, ChatHistoryV2
-            │   │   ├── dashboard/   # RiskStatusCard, StatsRow, SOSButton, NotificationPanel, etc.
-            │   │   ├── layout/      # Sidebar, MobileSidebar, TopBar, BottomNav
-            │   │   ├── log/         # BPTrendChart, PastLogsTab, DailyHabitsTab
-            │   │   ├── notifications/ # NotifCard, NotifFilters, NotifEmptyState, notifTypes.ts
-            │   │   └── reports/     # ReportStatCards, ReportBPChart, ReportHighlights, ReportList
-            │   └── shared/          # InputField, BPSparkline, PasswordStrength, SectionHeading
-            ├── hooks/               # useEmergencyCases, usePatientDetails, useUpdateClinicalRecord
+            │   │   ├── chat/
+            │   │   ├── dashboard/
+            │   │   ├── layout/           # Sidebar, MobileSidebar, TopBar, BottomNav
+            │   │   ├── log/
+            │   │   ├── notifications/
+            │   │   └── reports/
+            │   └── shared/
+            ├── hooks/
+            │   ├── useEmergencyCases.ts  # Real API, 30s polling, acknowledge handler
+            │   ├── usePatientDetails.ts  # fetchPatient + patchPatient
+            │   └── useUpdateClinicalRecord.ts
             ├── pages/
             │   ├── Home.tsx
-            │   ├── admin/           # AdminOverview, PatientList, PatientDetails, EmergencyCases, UpdateClinicalRecord
-            │   ├── auth/            # AuthPage
+            │   ├── admin/
+            │   │   ├── AdminOverview.tsx       # Live dashboard stats
+            │   │   ├── PatientList.tsx
+            │   │   ├── PatientDetails.tsx
+            │   │   ├── EmergencyCases.tsx      # SOS alerts + acknowledge
+            │   │   └── UpdateClinicalRecord.tsx
+            │   ├── auth/
             │   └── patient/
             │       ├── PatientDashboard.tsx
             │       ├── PatientLog.tsx
@@ -150,8 +207,7 @@ team-plugins/
             │       ├── PatientReports.tsx
             │       ├── PatientChat.tsx
             │       ├── PatientSettings.tsx
-            │       └── chat/
-            │           └── chatLogic.ts       # Rule-based intent engine
+            │       └── chat/chatLogic.ts       # Rule-based intent engine
             └── utils/
                 └── dateUtils.ts
 ```
@@ -162,9 +218,9 @@ team-plugins/
 
 ### Prerequisites
 
-- Python 3.11+
 - Node.js 18+
 - npm or yarn
+- A MongoDB instance (local or [MongoDB Atlas](https://www.mongodb.com/atlas))
 
 ---
 
@@ -172,32 +228,19 @@ team-plugins/
 
 ```bash
 # 1. Navigate to the backend folder
-cd backend
+cd aegis-backend
 
-# 2. Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate        # macOS / Linux
-# venv\Scripts\activate         # Windows
+# 2. Install dependencies
+npm install
 
-# 3. Install dependencies
-pip install -r requirements.txt
+# 3. Create a .env.local file (see Environment Variables section)
+cp .env.example .env.local      # or create manually
 
-# 4. Create a .env file (see Environment Variables section)
-cp .env.example .env            # or create manually
-
-# 5. Run migrations
-python manage.py migrate
-
-# 6. Create a superuser (for admin access)
-python manage.py createsuperuser
-
-# 7. Start the development server
-python manage.py runserver
+# 4. Start the development server
+npm run dev
 ```
 
-The API will be available at `http://localhost:8000`.
-
-Interactive API docs (Swagger UI) are available at `http://localhost:8000/api/docs/`.
+The API will be available at `http://localhost:3000`.
 
 ---
 
@@ -223,107 +266,133 @@ The app will be available at `http://localhost:5173`.
 
 ## 🔐 Environment Variables
 
-### Backend — `backend/.env`
+### Backend — `aegis-backend/.env.local`
 
 | Variable | Required | Description |
 |---|---|---|
-| `SECRET_KEY` | ✅ | Django secret key |
-| `DEBUG` | ✅ | `True` for development, `False` for production |
-| `DATABASE_URL` | Optional | Database URL (defaults to SQLite if not set) |
-| `GEMINI_API_KEY` | ✅ | Google Gemini API key for AI health analysis |
-| `ALLOWED_HOSTS` | Optional | Comma-separated list of allowed hosts |
+| `MONGODB_URI` | ✅ | MongoDB connection string |
+| `JWT_ACCESS_SECRET` | ✅ | Secret for signing access tokens (HS256) |
+| `JWT_REFRESH_SECRET` | ✅ | Secret for signing refresh tokens (HS256) |
+| `NODEMAILER_USER` | Optional | Gmail address for outbound notifications |
+| `NODEMAILER_PASS` | Optional | Gmail app password |
 
 ### Frontend — `frontend/aegis/.env`
 
 | Variable | Required | Description |
 |---|---|---|
-| `VITE_API_BASE_URL` | ✅ | Base URL of the Django API, e.g. `http://localhost:8000` |
+| `VITE_API_BASE_URL` | ✅ | Base URL of the Next.js API, e.g. `http://localhost:3000` |
 
 ---
 
 ## 📡 API Reference
 
-All endpoints are prefixed as shown. Authentication uses the DRF `Token` scheme — include `Authorization: Token <your-token>` in the request header for protected routes.
+All protected endpoints require the `aegis-token` cookie (set automatically on login) or an `Authorization: Bearer <token>` header. Admin-only endpoints additionally require `role: admin` in the token payload.
 
-### Auth & Patient
+### Auth
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `POST` | `/api/register/` | Public | Register a new patient account |
-| `POST` | `/api/login/` | Public | Log in and receive an auth token |
-| `GET` | `/api/dashboard/` | 🔒 Token | Get the authenticated patient's profile |
+| `POST` | `/api/auth/register` | Public | Register a new patient account |
+| `POST` | `/api/auth/login` | Public | Log in — sets `aegis-token` + `aegis-refresh` cookies |
+| `POST` | `/api/auth/logout` | Public | Clears auth cookies |
+| `POST` | `/api/auth/refresh` | 🍪 Refresh token | Rotates access token |
+| `GET` | `/api/auth/me` | 🔒 Token | Returns full user profile |
+| `GET` | `/hospitals` | Public | List all registered hospitals |
 
-#### `POST /api/register/`
+#### `POST /api/auth/register`
 
 ```json
 {
-  "username": "john_doe",
-  "email": "john@example.com",
+  "firstName": "Amara",
+  "lastName": "Obi",
+  "email": "amara@example.com",
   "password": "SecurePass123",
-  "first_name": "John",
-  "last_name": "Doe",
-  "date_of_birth": "1970-05-15",
-  "gender": "M",
-  "phone_number": "08012345678",
-  "address": "12 Example Street, Lagos"
+  "phoneNumber": "08012345678",
+  "gender": "Female",
+  "dateOfBirth": "1970-05-15",
+  "hospitalId": "<hospital-object-id>"
 }
 ```
 
-**Response `201`:**
-```json
-{
-  "message": "Patient registered successfully",
-  "token": "abc123tokenhere"
-}
-```
-
-#### `POST /api/login/`
+#### `POST /api/auth/login`
 
 ```json
 {
-  "username": "john_doe",
+  "email": "amara@example.com",
   "password": "SecurePass123"
 }
 ```
 
-**Response `200`:**
-```json
-{
-  "message": "Login successful",
-  "token": "abc123tokenhere"
-}
-```
-
 ---
 
-### Medical / Vitals
+### Patient
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
-| `POST` | `/api/medical/submit-vitals/` | 🔒 Token | Submit vitals + receive AI health analysis |
-| `GET` | `/api/medical/history/` | 🔒 Token | Get the patient's vital sign history |
-| `GET` | `/api/admin/patients/<id>/` | 🔒 Admin | Get full patient detail (admin only) |
-
-#### `POST /api/medical/submit-vitals/`
-
-```json
-{
-  "systolic_bp": 140,
-  "diastolic_bp": 90,
-  "heart_rate": 78,
-  "blood_glucose": 6.2,
-  "weight_kg": 82.5,
-  "notes": "Felt slightly dizzy in the morning"
-}
-```
-
-**Response `200`:** Returns the saved vital log plus an AI-generated stroke risk analysis and prevention recommendations.
+| `GET` | `/api/patient/overview` | 🔒 Patient | Patient dashboard data (risk, vitals, meds) |
+| `GET` | `/api/patient/profile` | 🔒 Patient | Patient profile |
+| `PATCH` | `/api/patient/profile` | 🔒 Patient | Update patient profile |
+| `POST` | `/api/vitals` | 🔒 Patient | Submit vitals — triggers risk score calculation |
+| `GET` | `/api/vitals/latest` | 🔒 Patient | Most recent vital log |
+| `GET` | `/api/risk` | 🔒 Patient | Risk score history |
 
 ---
 
-### API Documentation
+### Emergency
 
-Swagger UI is served at `/api/docs/` when the server is running. The raw OpenAPI schema is at `/api/schema/`.
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/emergency/trigger` | 🔒 Patient | Trigger an SOS — auto-notifies caregiver + clinic |
+| `GET` | `/api/emergency/:id` | 🔒 Patient | Full emergency record including notification log |
+| `POST` | `/api/emergency/:id/acknowledge` | 🔒 Admin | Mark emergency as ACKNOWLEDGED |
+
+> The backend resolves the patient's `caregiverName` and linked `hospitalId → Hospital.name` automatically. If neither is set the SOS still records and returns a `message` warning.
+
+---
+
+### Admin
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `POST` | `/api/admin/register` | Public* | Create an admin account |
+| `GET` | `/api/admin/me` | 🔒 Admin | Admin profile |
+| `GET` | `/api/admin/dashboard` | 🔒 Admin | Stats, risk distribution, recent activity, open emergencies |
+| `GET` | `/api/admin/patients` | 🔒 Admin | Paginated patient list (`?search`, `?page`, `?limit`) |
+| `GET` | `/api/admin/patients/:id` | 🔒 Admin | Full patient profile |
+| `PATCH` | `/api/admin/patients/:id` | 🔒 Admin | Update patient record |
+
+> \* Admin registration should be restricted in production via a secret key or invite flow.
+
+#### `GET /api/admin/dashboard` — response shape
+
+```json
+{
+  "success": true,
+  "data": {
+    "stats": {
+      "totalPatients": 24,
+      "highRiskCases": 5,
+      "logsToday": 8,
+      "activeCaretakers": 17
+    },
+    "riskDistribution": { "high": 5, "elevated": 9, "stable": 10, "total": 24 },
+    "recentActivity": [
+      {
+        "logId": "…",
+        "patientId": "…",
+        "fullName": "John Doe",
+        "riskLevel": "HIGH",
+        "systolic": 178,
+        "diastolic": 110,
+        "heartRate": 92,
+        "symptoms": ["dizziness", "headache"],
+        "loggedAt": "2026-02-22T13:45:00.000Z"
+      }
+    ],
+    "openEmergencies": 2
+  }
+}
+```
 
 ---
 
@@ -396,26 +465,28 @@ The `<AccessibilityBar />` component (shown in `<TopBar />`) combines:
 
 | Role | Access |
 |---|---|
-| **Patient** | Register, log in, view dashboard, submit vitals, view history and reports, chat with health bot, manage settings |
-| **Admin / Clinician** | All patient data, emergency cases, update clinical records, notify caretakers |
+| **Patient** | Register, log in, view dashboard, submit vitals, view history and reports, trigger SOS, chat with health bot, manage settings |
+| **Admin / Clinician** | Live dashboard stats, all patient records, emergency SOS management (view + acknowledge), update clinical records, notify caretakers |
 
-Route protection is handled on the frontend by reading the user role from `localStorage` and redirecting accordingly after login.
+Route protection is handled on the frontend via `ProtectedRoute` — reads the `role` field from the `aegis-user` cookie and redirects accordingly after login.
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] Patient registration & login
-- [x] Patient dashboard with risk status
-- [x] Vitals submission + AI analysis (Gemini)
+- [x] Patient registration & login (JWT, cookie-based)
+- [x] Hospital selector on registration
+- [x] Patient dashboard with real-time risk status
+- [x] Vitals submission + on-device risk score engine
 - [x] Vital sign history
-- [x] Admin patient management
+- [x] Admin dashboard with live stats + risk distribution
+- [x] Admin patient list, detail view, and clinical record editor
+- [x] Emergency SOS — trigger, notify, acknowledge
 - [x] Rule-based health chatbot (15+ intents)
 - [x] Notification centre
 - [x] Health reports
 - [x] i18n (English, Yoruba, Hausa, Igbo)
 - [x] Accessibility (large text + TTS)
-- [x] Swagger API docs
 - [ ] Push notifications
 - [ ] PDF report export
 - [ ] Medication tracker

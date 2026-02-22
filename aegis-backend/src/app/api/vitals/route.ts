@@ -6,7 +6,7 @@ import Patient, { type IPatient } from '@/models/Patient.model';
 import DoseLog from '@/models/DoseLog.model';
 import RiskScore from '@/models/RiskScore.model';
 import { vitalLogSchema } from '@/schemas/vitals.schema';
-import { calculateRiskScore } from '@/lib/riskCalculator';
+import { analyzeStrokeRiskWithGemini } from '@/lib/geminiRisk';
 import mongoose from 'mongoose';
 
 async function getAdherencePercent(patientId: string): Promise<number> {
@@ -67,30 +67,70 @@ async function postHandler(req: AuthenticatedRequest) {
       return notFoundResponse('Patient');
     }
 
+    // 1. Persist vitals log
     const vitalLog = await VitalLog.create({
       patientId: new mongoose.Types.ObjectId(patientId),
       ...parsed.data,
     });
 
-    // Calculate updated risk score
+    // 2. Fetch medication adherence rate
     const adherence = await getAdherencePercent(patientId);
-    const riskResult = calculateRiskScore(patient, parsed.data.systolic, adherence);
 
+    // 3. Run Gemini AI stroke risk analysis
+    let aiResult;
+    try {
+      aiResult = await analyzeStrokeRiskWithGemini(patient, parsed.data, adherence);
+    } catch (aiErr) {
+      console.error('[POST /api/vitals] Gemini AI error:', aiErr);
+      // Fallback: derive a basic risk from BP only
+      const sys = parsed.data.systolic;
+      aiResult = {
+        riskLevel: sys >= 160 ? 'HIGH' as const : sys >= 130 ? 'ELEVATED' as const : 'STABLE' as const,
+        score: sys >= 160 ? 75 : sys >= 130 ? 45 : 20,
+        justification: 'AI analysis unavailable. Risk estimated from blood pressure reading only.',
+        strokePreventionSteps: [
+          'Monitor blood pressure daily and keep a log.',
+          'Take all prescribed medications as directed.',
+          'Follow a low-sodium, heart-healthy diet.',
+          'Stay physically active with at least 30 minutes of moderate exercise per day.',
+          'Reduce stress and maintain healthy sleep habits.',
+        ],
+      };
+    }
+
+    // 4. Save AI analysis back to the vital log
+    await VitalLog.findByIdAndUpdate(vitalLog._id, {
+      aiReport: {
+        riskLevel: aiResult.riskLevel,
+        score: aiResult.score,
+        justification: aiResult.justification,
+        strokePreventionSteps: aiResult.strokePreventionSteps,
+      },
+    });
+
+    // 5. Persist the risk score record
     const savedRisk = await RiskScore.create({
       patientId: new mongoose.Types.ObjectId(patientId),
-      score:        riskResult.score,
-      level:        riskResult.level,
-      drivers:      riskResult.drivers,
+      score: aiResult.score,
+      level: aiResult.riskLevel,
+      drivers: [],           // Gemini doesn't return discrete drivers; justification covers it
+      justification: aiResult.justification,
+      strokePreventionSteps: aiResult.strokePreventionSteps,
       calculatedAt: new Date(),
     });
 
+    // 6. Return enriched response to frontend
     return successDataResponse(
       {
-        ...vitalLog.toObject(),
+        vitalLogId: vitalLog._id,
+        loggedAt: vitalLog.loggedAt,
         riskUpdate: {
-          score:   savedRisk.score,
-          level:   savedRisk.level,
-          drivers: savedRisk.drivers,
+          level: savedRisk.level,
+          score: savedRisk.score,
+          justification: savedRisk.justification,
+          strokePreventionSteps: savedRisk.strokePreventionSteps,
+          requiresDoctorVisit: savedRisk.level !== 'STABLE',
+          isUrgent: savedRisk.level === 'HIGH',
         },
       },
       201,
@@ -103,4 +143,3 @@ async function postHandler(req: AuthenticatedRequest) {
 
 export const GET = withAuth(getHandler);
 export const POST = withAuth(postHandler);
-

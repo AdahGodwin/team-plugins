@@ -10,12 +10,6 @@ import { getAllEmergencies } from '@/lib/emergencyStore';
 import mongoose from 'mongoose';
 import { NextResponse } from 'next/server';
 
-// ── GET /api/admin/dashboard ──────────────────────────────────────────────────
-// Returns all data needed by the AdminOverview page:
-//   - stat cards  (totalPatients, highRisk, logsToday, activeCaretakers)
-//   - riskDistribution
-//   - recentActivity  (last 5 vital logs with patient details)
-//   - openEmergencies count
 
 async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
   try {
@@ -24,8 +18,6 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
     if (req.user.role !== 'admin') {
       return unauthorizedResponse('Access restricted to admin accounts');
     }
-
-    // ── Resolve admin → hospitalId ──────────────────────────────────────────
     const adminId = req.user.patientId;
     const admin   = await Admin.findById(adminId).lean<IAdmin>();
     if (!admin) return notFoundResponse('Admin profile');
@@ -41,7 +33,6 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
       (admin.hospitalId as mongoose.Types.ObjectId).toString(),
     );
 
-    // ── Load all patients for this hospital ─────────────────────────────────
     const patients = await Patient.find({ hospitalId: hospitalOid })
       .select('_id userId caregiverName caregiverPhone smokingStatus diabetic')
       .lean<IPatient[]>();
@@ -66,8 +57,6 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
       });
     }
 
-    // ── Latest risk score per patient ───────────────────────────────────────
-    // Aggregate to get only the most recent risk score for each patient.
     const latestRiskScores = await RiskScore.aggregate<{
       _id: mongoose.Types.ObjectId;
       level: 'HIGH' | 'ELEVATED' | 'STABLE';
@@ -94,13 +83,12 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
 
     for (const pid of patientIds) {
       const risk = riskMap.get(pid.toString());
-      if (!risk) { stableCases++; continue; } // no score yet → treat as stable
+      if (!risk) { stableCases++; continue; } 
       if (risk.level === 'HIGH')     highRiskCases++;
       else if (risk.level === 'ELEVATED') elevatedCases++;
       else                            stableCases++;
     }
 
-    // ── Logs today ──────────────────────────────────────────────────────────
     const startOfDay = new Date();
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -109,18 +97,15 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
       loggedAt:  { $gte: startOfDay },
     });
 
-    // ── Active caretakers ───────────────────────────────────────────────────
     const activeCaretakers = patients.filter(
       (p) => p.caregiverName && p.caregiverName.trim().length > 0,
     ).length;
 
-    // ── Recent activity: last 5 vital logs ──────────────────────────────────
     const recentLogs = await VitalLog.find({ patientId: { $in: patientIds } })
       .sort({ loggedAt: -1 })
       .limit(5)
       .lean<IVitalLog[]>();
 
-    // Map patientId → { fullName, userId }
     const patientUserMap = new Map<
       string,
       { fullName: string; riskLevel: string; patientId: string }
@@ -158,7 +143,6 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
       };
     });
 
-    // ── Open emergencies count ───────────────────────────────────────────────
     const openEmergencies = getAllEmergencies().filter(
       (e) =>
         e.status === 'OPEN' &&

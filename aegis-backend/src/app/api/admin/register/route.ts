@@ -47,7 +47,6 @@ export async function POST(req: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Upsert the Hospital — one hospital can have multiple admins/practitioners
     const existingHospital = await Hospital.findOne({ registrationNo }).lean();
     const hospital = existingHospital ?? await Hospital.create({
       name:    hospitalName,
@@ -58,7 +57,6 @@ export async function POST(req: NextRequest) {
     });
     const hospitalId = (hospital._id as { toString(): string }).toString();
 
-    // Create the base User with role = 'admin'
     const user = await User.create({
       firstName,
       lastName,
@@ -67,7 +65,6 @@ export async function POST(req: NextRequest) {
       role: 'admin',
     });
 
-    // Create the Admin profile — linked to the hospital
     const admin = await Admin.create({
       userId:     user._id,
       hospitalId: hospital._id,
