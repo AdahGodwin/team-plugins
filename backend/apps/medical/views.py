@@ -13,8 +13,10 @@ from .serializers import VitalSignLogSerializer, VitalHistorySerializer, VitalSi
 from apps.patients.models import Patient
 from apps.patients.serializers import PatientProfileSerializer
 
-# Configure your API key
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY", "YOUR_GEMINI_API_KEY"))
+from django.conf import settings
+import google.generativeai as genai
+
+genai.configure(api_key=settings.GEMINI_API_KEY)
 
 class PredictHealthOutcomeView(APIView):
     # Ensure only logged-in patients with a valid token can access this
