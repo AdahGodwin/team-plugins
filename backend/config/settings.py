@@ -24,7 +24,20 @@ DATABASES = {
         ssl_require=not DEBUG  # Force SSL on Render, disable for local SQLite
     )
 }
+PREREQUISITE_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'drf_spectacular',
+    'whitenoise.runserver_nostatic', # Recommended for Whitenoise
+]
 
+INSTALLED_APPS = PREREQUISITE_APPS + CUSTOM_APPS
 # --- STATIC FILES (WhiteNoise) ---
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
