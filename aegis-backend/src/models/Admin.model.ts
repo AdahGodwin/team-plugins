@@ -3,25 +3,21 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export interface IAdmin extends Document {
   _id: mongoose.Types.ObjectId;
   userId: mongoose.Types.ObjectId;
-  hospitalId: mongoose.Types.ObjectId;    // ← ref to Hospital document
+  hospitalId: mongoose.Types.ObjectId;   
 
-  // Hospital / practice details
   hospitalName:     string;
   hospitalAddress:  string;
   hospitalPhone:    string;
   hospitalEmail:    string;
-  registrationNo:   string;           // Hospital / GMC registration number
+  registrationNo:   string;          
+  specialty:        string;          
+  licenseNumber:    string;          
+  title:            string;           
 
-  // Practitioner details
-  specialty:        string;           // e.g. 'Cardiology', 'General Practice'
-  licenseNumber:    string;           // Medical license / NMC pin
-  title:            string;           // e.g. 'Dr', 'Prof', 'Mr'
-
-  // Department / role within hospital
   department:       string;
-  jobTitle:         string;           // e.g. 'Consultant Cardiologist'
+  jobTitle:         string;           
 
-  isVerified:       boolean;          // manually verified by super-admin
+  isVerified:       boolean;        
   createdAt:        Date;
 }
 

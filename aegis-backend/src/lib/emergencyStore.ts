@@ -1,14 +1,5 @@
-/**
- * emergencyStore.ts
- *
- * In-memory stores for the hackathon MVP.
- * These persist for the lifetime of the Node.js process.
- * In production replace with a MongoDB collection.
- */
 
 import { randomUUID } from 'crypto';
-
-// ── Types ─────────────────────────────────────────────────────────────────────
 
 export type EmergencyStatus = 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED';
 
@@ -36,8 +27,6 @@ export interface EmergencyRecord {
   notifications:    EmergencyNotification[];
 }
 
-// ── Global singleton stores ───────────────────────────────────────────────────
-// Use globalThis so Next.js hot-reload doesn't wipe the data in dev.
 
 declare global {
   // eslint-disable-next-line no-var
@@ -50,8 +39,6 @@ function getStore(): EmergencyRecord[] {
   }
   return globalThis.__emergencyStore;
 }
-
-// ── Public helpers ────────────────────────────────────────────────────────────
 
 export interface CreateEmergencyInput {
   patientId:        string;
@@ -78,7 +65,6 @@ export function createEmergency(input: CreateEmergencyInput): EmergencyRecord {
 
   const notifications: EmergencyNotification[] = [];
 
-  // ── Caregiver notification ─────────────────────────────────────────────────
   if (input.caregiverName) {
     notifications.push({
       id:            randomUUID(),
@@ -91,7 +77,6 @@ export function createEmergency(input: CreateEmergencyInput): EmergencyRecord {
     });
   }
 
-  // ── Clinic notification ────────────────────────────────────────────────────
   if (input.clinicName) {
     notifications.push({
       id:            randomUUID(),
@@ -135,7 +120,6 @@ export function acknowledgeEmergency(
   record.acknowledgedBy = acknowledgedBy;
   record.acknowledgedAt = new Date().toISOString();
 
-  // Mark all notifications as read
   record.notifications.forEach((n) => { n.read = true; });
 
   return record;

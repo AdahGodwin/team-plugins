@@ -33,7 +33,6 @@ export async function POST(req: NextRequest) {
 
     const userId = (user._id as { toString(): string }).toString();
 
-    // ── Admin login ────────────────────────────────────────────────────────
     if (user.role === 'admin') {
       const admin = await Admin.findOne({ userId: user._id }).lean();
       if (!admin) {
@@ -64,7 +63,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // ── Patient login ──────────────────────────────────────────────────────
     const patient = await Patient.findOne({ userId: user._id }).lean();
     if (!patient) {
       return errorResponse('Patient profile not found', 404);

@@ -14,7 +14,6 @@ export function calculateRiskScore(
   const drivers: string[] = [];
   let score = 0;
 
-  // ── BP component (0–40 pts) ──────────────────────────────────────────────
   if (latestSystolic >= 160) {
     score += 40;
     drivers.push('BP severely elevated (≥160 mmHg)');
@@ -29,7 +28,6 @@ export function calculateRiskScore(
     drivers.push('BP mildly elevated (120–129 mmHg)');
   }
 
-  // ── Medication adherence (0–30 pts) ─────────────────────────────────────
   if (medAdherencePercent < 50) {
     score += 30;
     drivers.push('Medication adherence critically low (<50%)');
@@ -41,7 +39,6 @@ export function calculateRiskScore(
     drivers.push('Medication adherence below target (75–89%)');
   }
 
-  // ── Risk factors (0–30 pts, capped) ─────────────────────────────────────
   let riskFactorScore = 0;
 
   if (patient.diabetic) {
@@ -69,7 +66,6 @@ export function calculateRiskScore(
 
   score += Math.min(riskFactorScore, 30);
 
-  // ── Level thresholds ─────────────────────────────────────────────────────
   const finalScore = Math.min(score, 100);
   let level: 'STABLE' | 'ELEVATED' | 'HIGH';
 

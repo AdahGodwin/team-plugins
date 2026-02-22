@@ -31,7 +31,6 @@ async function handler(req: AuthenticatedRequest) {
         ? new Date((user as { createdAt?: Date }).createdAt!).toISOString()
         : null,
 
-      // Patient profile (null if not yet populated)
       phoneNumber:    patient?.phoneNumber   ?? null,
       gender:         patient?.gender        ?? null,
       dateOfBirth:    patient?.dateOfBirth
@@ -48,7 +47,6 @@ async function handler(req: AuthenticatedRequest) {
       caregiverEmail: patient?.caregiverEmail ?? null,
       caregiverPhone: patient?.caregiverPhone ?? null,
 
-      // Mongoose ObjectId needs toString for JSON
       _patientMongoId: patient
         ? (patient._id as mongoose.Types.ObjectId).toString()
         : null,
