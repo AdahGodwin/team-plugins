@@ -1,84 +1,76 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useEffect,
-  type ReactNode,
-} from "react";
-import { useNavigate } from "react-router-dom";
-import { clearSession, getStoredUser, fetchMe } from "../api/authService";
-import type { AuthResponse } from "../types/auth.types";
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import type { AuthResponse, PatientProfile } from '../api/types';
+import { authService } from '../api/services/auth';
+import { patientService } from '../api/services/patient';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type AuthUser = AuthResponse["user"];
-
-interface AuthContextValue {
-  user: AuthUser | null;
-  isAuthenticated: boolean;
-  isAdmin: boolean;
-  /** Call after a successful login / register to sync context */
-  syncUser: () => void;
-  /** Clears cookies and redirects to /auth */
+interface AuthContextType {
+  user: AuthResponse | null;
+  profile: PatientProfile | null;
+  loading: boolean;
+  login: (payload: { username: string; password: string }) => Promise<void>;
   logout: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AuthContext = createContext<AuthContextValue | null>(null);
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<AuthResponse | null>(null);
+  const [profile, setProfile] = useState<PatientProfile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
-
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const navigate = useNavigate();
-
-  // Initialise from the cookie that was set after login / register
-  const [user, setUser] = useState<AuthUser | null>(() => getStoredUser());
-
-  /** On mount — if a token exists, hit /me to get fresh user data */
   useEffect(() => {
-    if (!getStoredUser()) return; // not logged in — skip
-    fetchMe()
-      .then(setUser)
-      .catch(() => {
-        // Token is invalid / expired — clear stale session silently
-        clearSession();
-        setUser(null);
-      });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    const storedUser = localStorage.getItem('aegis_user');
+    const token = localStorage.getItem('aegis_token');
+    if (storedUser && token) {
+      setUser(JSON.parse(storedUser));
+      fetchProfile();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
-  /** Re-reads the cookie — call this right after login() / register() */
-  const syncUser = useCallback(() => {
-    setUser(getStoredUser());
-  }, []);
+  const fetchProfile = async () => {
+    try {
+      const profileData = await patientService.getProfile();
+      setProfile(profileData);
+    } catch (error) {
+      console.error('Failed to fetch profile', error);
+      logout();
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const logout = useCallback(() => {
-    clearSession();
+  const login = async (payload: { username: string; password: string }) => {
+    const data = await authService.login(payload);
+    localStorage.setItem('aegis_token', data.token);
+    localStorage.setItem('aegis_user', JSON.stringify(data));
+    setUser(data);
+    await fetchProfile();
+  };
+
+  const logout = () => {
+    authService.logout();
     setUser(null);
-    navigate("/auth", { replace: true });
-  }, [navigate]);
+    setProfile(null);
+  };
+
+  const refreshProfile = async () => {
+    await fetchProfile();
+  };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated: !!user,
-        isAdmin: user?.role === "admin",
-        syncUser,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, profile, loading, login, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-// ─── Hook ─────────────────────────────────────────────────────────────────────
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
-  return ctx;
-}
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

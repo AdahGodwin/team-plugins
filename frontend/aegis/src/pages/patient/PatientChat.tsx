@@ -1,16 +1,16 @@
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { MOCK_NOTIFICATIONS, MOCK_PATIENT, QUICK_PROMPTS } from '../../components/patient/data/mockData'
-import Sidebar       from '../../components/patient/layout/Sidebar'
+import Sidebar from '../../components/patient/layout/Sidebar'
 import MobileSidebar from '../../components/patient/layout/MobileSidebar'
-import TopBar        from '../../components/patient/layout/TopBar'
-import BottomNav     from '../../components/patient/layout/BottomNav'
+import TopBar from '../../components/patient/layout/TopBar'
+import BottomNav from '../../components/patient/layout/BottomNav'
 import { useLanguage } from '../../i18n/LanguageContext'
 
-import TopicCards    from '../../components/patient/chat/TopicCards'
+import TopicCards from '../../components/patient/chat/TopicCards'
 import ChatHistoryV2 from '../../components/patient/chat/ChatHistoryV2'
-import ChatWindow    from '../../components/patient/chat/ChatWindow'
-import ChatInput     from '../../components/patient/chat/ChatInput'
-import SafetyAlert   from '../../components/patient/chat/SafetyAlert'
+import ChatWindow from '../../components/patient/chat/ChatWindow'
+import ChatInput from '../../components/patient/chat/ChatInput'
+import SafetyAlert from '../../components/patient/chat/SafetyAlert'
 
 import { ShieldCheck, Heart, Apple, Pill, Clock } from 'lucide-react'
 import { generateResponse, isEmergency, MOCK_CONTEXT } from './chat/chatLogic'
@@ -18,21 +18,21 @@ import { generateResponse, isEmergency, MOCK_CONTEXT } from './chat/chatLogic'
 type Msg = { role: 'user' | 'bot'; text: string; time: string }
 
 const CHAT_HISTORY = [
-    { label: 'Yesterday', preview: 'What foods help lower blood pressure?'   },
-    { label: 'Feb 19',    preview: 'Should I be worried about my dizziness?' },
-    { label: 'Feb 18',    preview: 'How much water should I drink daily?'    },
+    { label: 'Yesterday', preview: 'What foods help lower blood pressure?' },
+    { label: 'Feb 19', preview: 'Should I be worried about my dizziness?' },
+    { label: 'Feb 18', preview: 'How much water should I drink daily?' },
 ]
 
 export default function PatientChat() {
-    const { t, locale }  = useLanguage()
-    const [sidebarOpen,  setSidebarOpen]  = useState(false)
-    const [safetyAlert,  setSafetyAlert]  = useState(false)
-    const [isTyping,     setIsTyping]     = useState(false)
-    const [showHistory,  setShowHistory]  = useState(false)
-    const [input,        setInput]        = useState('')
+    const { t, locale } = useLanguage()
+    const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [safetyAlert, setSafetyAlert] = useState(false)
+    const [isTyping, setIsTyping] = useState(false)
+    const [showHistory, setShowHistory] = useState(false)
+    const [input, setInput] = useState('')
     const unreadCount = MOCK_NOTIFICATIONS.length
-    const bottomRef   = useRef<HTMLDivElement>(null)
-    const inputRef    = useRef<HTMLInputElement>(null)
+    const bottomRef = useRef<HTMLDivElement>(null)
+    const inputRef = useRef<HTMLInputElement>(null)
 
     const now = () =>
         new Date().toLocaleTimeString(locale === 'en' ? 'en-GB' : locale, {
@@ -42,22 +42,22 @@ export default function PatientChat() {
     const TOPIC_CARDS = useMemo(() => [
         {
             icon: Heart, color: 'from-rose-400 to-rose-500',
-            label: 'Blood Pressure',   prompt: 'Why is my risk elevated?',
+            label: 'Blood Pressure', prompt: 'Why is my risk elevated?',
             sub: 'Understand your readings',
         },
         {
             icon: Apple, color: 'from-emerald-400 to-emerald-600',
-            label: 'Nutrition',        prompt: 'What should I eat today?',
+            label: 'Nutrition', prompt: 'What should I eat today?',
             sub: 'DASH diet guidance',
         },
         {
-            icon: Pill,  color: 'from-blue-400 to-blue-600',
-            label: 'Medication',       prompt: 'Remind me about medication',
+            icon: Pill, color: 'from-blue-400 to-blue-600',
+            label: 'Medication', prompt: 'Remind me about medication',
             sub: 'Schedule & dosage',
         },
         {
             icon: ShieldCheck, color: 'from-amber-400 to-amber-500',
-            label: 'Risk Factors',     prompt: 'What are my stroke risk factors?',
+            label: 'Risk Factors', prompt: 'What are my stroke risk factors?',
             sub: 'Know your risks',
         },
     ], [])
