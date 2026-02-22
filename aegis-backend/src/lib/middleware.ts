@@ -6,13 +6,19 @@ export interface AuthenticatedRequest extends NextRequest {
   user: AccessTokenPayload;
 }
 
-type RouteHandler = (
+type AuthedHandler = (
   req: AuthenticatedRequest,
   context: { params: Promise<Record<string, string>> },
 ) => Promise<NextResponse>;
 
-export function withAuth(handler: RouteHandler): RouteHandler {
-  return async (req: AuthenticatedRequest, context) => {
+// Return type uses NextRequest so Next.js build is satisfied; we cast internally.
+type NextRouteHandler = (
+  req: NextRequest,
+  context: { params: Promise<Record<string, string>> },
+) => Promise<NextResponse>;
+
+export function withAuth(handler: AuthedHandler): NextRouteHandler {
+  return async (req: NextRequest, context) => {
     try {
       const authHeader = req.headers.get('Authorization');
 
@@ -23,9 +29,10 @@ export function withAuth(handler: RouteHandler): RouteHandler {
       const token = authHeader.slice(7);
 
       const payload = await verifyAccessToken(token);
-      req.user = payload;
+      const authedReq = req as AuthenticatedRequest;
+      authedReq.user = payload;
 
-      return handler(req, context);
+      return handler(authedReq, context);
     } catch {
       return unauthorizedResponse('Invalid or expired token');
     }

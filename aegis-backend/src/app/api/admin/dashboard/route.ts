@@ -145,7 +145,7 @@ async function handler(req: AuthenticatedRequest): Promise<NextResponse> {
 
     const openEmergencies = getAllEmergencies().filter(
       (e) =>
-        e.status === 'OPEN' &&
+        e.status === 'PENDING' &&
         patientIds.some((pid) => pid.toString() === e.patientId),
     ).length;
 

@@ -1,34 +1,39 @@
 import { useEffect, useRef, useState } from 'react'
-import { X, Bell, Send } from 'lucide-react'
+import { X, Bell, Send, Loader2 } from 'lucide-react'
 import type { ApiPatient } from '../../types/patient.types'
 
 interface NotifyCaretakerModalProps {
     patient: ApiPatient
     onClose: () => void
-    onSend: (message: string) => void
+    onSend: (message: string) => Promise<void>
 }
 
 export default function NotifyCaretakerModal({ patient, onClose, onSend }: NotifyCaretakerModalProps) {
     const [message, setMessage] = useState('')
+    const [sending, setSending] = useState(false)
     const backdropRef = useRef<HTMLDivElement>(null)
     const fullName = `${patient.firstName} ${patient.lastName}`
 
     useEffect(() => {
-        const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+        const handler = (e: KeyboardEvent) => { if (e.key === 'Escape' && !sending) onClose() }
         window.addEventListener('keydown', handler)
         return () => window.removeEventListener('keydown', handler)
-    }, [onClose])
+    }, [onClose, sending])
 
-    const handleSend = () => {
-        onSend(message.trim() || `Urgent: ${fullName}'s risk level is HIGH. Please check in immediately.`)
-        onClose()
+    const handleSend = async () => {
+        setSending(true)
+        try {
+            await onSend(message.trim())
+        } finally {
+            setSending(false)
+        }
     }
 
     return (
         <div
             ref={backdropRef}
             className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm px-4"
-            onClick={(e) => { if (e.target === backdropRef.current) onClose() }}
+            onClick={(e) => { if (e.target === backdropRef.current && !sending) onClose() }}
         >
             <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 relative animate-in">
                 {/* Header */}
@@ -42,7 +47,7 @@ export default function NotifyCaretakerModal({ patient, onClose, onSend }: Notif
                             <p className="text-slate-500 text-xs">Alerting caregiver for {fullName}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-700 transition-colors">
+                    <button onClick={onClose} disabled={sending} className="text-slate-400 hover:text-slate-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
@@ -84,16 +89,29 @@ export default function NotifyCaretakerModal({ patient, onClose, onSend }: Notif
                 />
 
                 <div className="flex gap-3">
-                    <button onClick={onClose} className="flex-1 border border-slate-200 text-slate-600 font-semibold text-sm py-3 rounded-xl hover:bg-slate-50 transition-colors">
+                    <button
+                        onClick={onClose}
+                        disabled={sending}
+                        className="flex-1 border border-slate-200 text-slate-600 font-semibold text-sm py-3 rounded-xl hover:bg-slate-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
                         Cancel
                     </button>
                     <button
                         onClick={handleSend}
-                        disabled={!patient.caregiverName}
+                        disabled={!patient.caregiverName || !patient.caregiverEmail || sending}
                         className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-white font-semibold text-sm py-3 rounded-xl hover:bg-emerald-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
                     >
-                        <Send className="w-4 h-4" />
-                        Send Alert
+                        {sending ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Sending…
+                            </>
+                        ) : (
+                            <>
+                                <Send className="w-4 h-4" />
+                                Send Alert
+                            </>
+                        )}
                     </button>
                 </div>
             </div>

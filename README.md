@@ -6,6 +6,12 @@ Aegis is a full-stack health monitoring platform designed to help at-risk patien
 
 ---
 
+### 🤖 Powered by Google Gemini AI
+
+Aegis integrates **Google Gemini 2.5 Flash** as its AI engine for intelligent, context-aware stroke risk assessment. After each vitals submission, the platform sends the patient's health data — including blood pressure readings, lifestyle factors, medical history, and symptoms — to Gemini, which returns a structured risk score, clinical justification, contributing risk drivers, and personalised stroke prevention recommendations. This AI-driven layer supplements the on-device rule-based engine, enabling nuanced analysis that goes beyond threshold-based scoring.
+
+---
+
 ## 📋 Table of Contents
 
 - [Features](#features)
@@ -79,6 +85,7 @@ Aegis is a full-stack health monitoring platform designed to help at-risk patien
 | bcryptjs | 2.4 | Password hashing |
 | Zod | 3.24 | Request validation |
 | Nodemailer | 6.9 | Email notifications |
+| Google Gemini 2.5 Flash | — | AI-powered stroke risk scoring and clinical recommendations |
 
 ---
 
@@ -361,7 +368,7 @@ All protected endpoints require the `aegis-token` cookie (set automatically on l
 | `GET` | `/api/admin/patients/:id` | 🔒 Admin | Full patient profile |
 | `PATCH` | `/api/admin/patients/:id` | 🔒 Admin | Update patient record |
 
-> \* Admin registration should be restricted in production via a secret key or invite flow.
+> \* **Admin accounts are provisioned exclusively by the Aegis platform team.** Hospitals and clinicians are onboarded manually — there is no public-facing admin registration page. Once an admin account has been created and linked to a hospital, the clinician can log in through the standard login page and immediately access their hospital's patient records, emergency alerts, and dashboard. This ensures that only verified, authorised healthcare institutions are granted administrative access to patient data.
 
 #### `GET /api/admin/dashboard` — response shape
 
@@ -467,6 +474,8 @@ The `<AccessibilityBar />` component (shown in `<TopBar />`) combines:
 |---|---|
 | **Patient** | Register, log in, view dashboard, submit vitals, view history and reports, trigger SOS, chat with health bot, manage settings |
 | **Admin / Clinician** | Live dashboard stats, all patient records, emergency SOS management (view + acknowledge), update clinical records, notify caretakers |
+
+> **Note on Admin Access:** Admin accounts are not self-service. Hospitals and clinicians are onboarded directly by the Aegis platform team — the registration flow exposed to the public is for patients only. Once an institution has been added to the system and their admin account is created, the assigned clinician logs in via the standard login page and gains full access to their hospital's patient data. This controlled onboarding model ensures that administrative access is limited strictly to verified healthcare providers.
 
 Route protection is handled on the frontend via `ProtectedRoute` — reads the `role` field from the `aegis-user` cookie and redirects accordingly after login.
 

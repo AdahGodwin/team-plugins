@@ -52,3 +52,29 @@ export async function patchPatient(
   )
   return data.data
 }
+
+// ── Notify caregiver ──────────────────────────────────────────────────────────
+
+export interface NotifyCaregiverPayload {
+  patientId: string
+  adminNote?: string
+}
+
+interface NotifyCaregiverResult {
+  sent: boolean
+  to: string
+  caregiverName: string
+  patientName: string
+}
+
+interface NotifyEnvelope {
+  success: boolean
+  data: NotifyCaregiverResult
+}
+
+export async function notifyCaregiver(
+  payload: NotifyCaregiverPayload,
+): Promise<NotifyCaregiverResult> {
+  const { data } = await client.post<NotifyEnvelope>('/api/notify/caregiver', payload)
+  return data.data
+}
