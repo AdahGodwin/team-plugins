@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { Bell, Menu, AlertTriangle, Pill, Activity, Calendar, Info, X } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { MOCK_PATIENT } from '../data/mockData'
 import AccessibilityBar from '../../common/AccessibilityBar'
 import { useLanguage } from '../../../i18n/LanguageContext'
+import { useAuth } from '../../../context/AuthContext'
 
 interface TopBarProps {
     onMenuClick: () => void
@@ -79,6 +79,11 @@ const TYPE_CONFIG: Record<NotifType, {
 const TopBar = ({ onMenuClick }: TopBarProps) => {
     const navigate = useNavigate()
     const { t, locale } = useLanguage()
+    const { user } = useAuth()
+
+    // Derive first name from fullName, fall back gracefully while loading
+    const firstName = user?.fullName?.split(' ')[0] ?? '...'
+    const avatarLetter = firstName[0]?.toUpperCase() ?? '?'
     const [open, setOpen] = useState(false)
     const [notifs, setNotifs] = useState(QUICK_NOTIFS)
     const dropdownRef = useRef<HTMLDivElement>(null)
@@ -123,13 +128,13 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
             {/* Greeting — takes remaining space, truncates */}
             <div className="flex-1 min-w-0">
                 <h1 className="text-base sm:text-lg font-extrabold text-slate-900 truncate">
-                    {greeting}, {MOCK_PATIENT.name} 👋
+                    {greeting}, {firstName} 👋
                 </h1>
                 <p className="text-slate-400 text-xs hidden sm:block truncate">
                     {new Date().toLocaleDateString(locale === 'en' ? 'en-GB' : locale, { weekday: 'long', day: 'numeric', month: 'long' })}
                     {' · '}
                     <span className="text-emerald-600 font-semibold">
-                        🔥 {t('dashboard.streakMessage' as any, MOCK_PATIENT.streakDays)}
+                        🔥 {t('dashboard.streakMessage' as any, 0)}
                     </span>
                 </p>
             </div>
@@ -251,7 +256,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
 
                 {/* Avatar */}
                 <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
-                    {MOCK_PATIENT.name[0]}
+                    {avatarLetter}
                 </div>
             </div>
 

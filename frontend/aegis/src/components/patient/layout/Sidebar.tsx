@@ -12,6 +12,7 @@ import { MOCK_PATIENT, RISK_CONFIG } from "../data/mockData";
 import { useState } from "react";
 import LogoutModal from "../../auth/modal/LogoutModal";
 import { useLanguage } from "../../../i18n/LanguageContext";
+import { useAuth } from "../../../context/AuthContext";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -59,6 +60,7 @@ const Sidebar = ({ unreadCount }: SidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+  const { logout } = useAuth();
   const riskCfg = RISK_CONFIG[MOCK_PATIENT.riskLevel];
   const [showLogout, setShowLogout] = useState(false);
 
@@ -152,7 +154,7 @@ const Sidebar = ({ unreadCount }: SidebarProps) => {
         <LogoutModal
           onConfirm={() => {
             setShowLogout(false);
-            navigate("/auth/login");
+            logout(); // clears cookies + redirects to /auth
           }}
           onCancel={() => setShowLogout(false)}
         />

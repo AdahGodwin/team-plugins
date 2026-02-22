@@ -1,61 +1,152 @@
 import { useState } from 'react'
-import { ClipboardList, CheckCircle2, AlertTriangle } from 'lucide-react'
-import { SYMPTOMS, MOCK_PATIENT } from '../data/mockData'
+import { ClipboardList, CheckCircle2, AlertTriangle, ShieldCheck, Activity, ChevronRight, ChevronLeft, Pill } from 'lucide-react'
+import { SYMPTOMS } from '../data/mockData'
 import { useLanguage } from '../../../i18n/LanguageContext'
+import { useAuth } from '../../../context/AuthContext'
+import { medicalService } from '../../../api/services/medical'
+import type { AiRiskUpdate } from '../../../api/types'
+
+type Step = 1 | 2 | 3
+
+const RISK_STYLES = {
+    STABLE: { bg: 'bg-emerald-50', border: 'border-emerald-200', badge: 'bg-emerald-100 text-emerald-700', icon: ShieldCheck, iconColor: 'text-emerald-600', dot: 'bg-emerald-500' },
+    ELEVATED: { bg: 'bg-amber-50', border: 'border-amber-200', badge: 'bg-amber-100 text-amber-700', icon: AlertTriangle, iconColor: 'text-amber-500', dot: 'bg-amber-500' },
+    HIGH: { bg: 'bg-rose-50', border: 'border-rose-200', badge: 'bg-rose-100 text-rose-700', icon: AlertTriangle, iconColor: 'text-rose-500', dot: 'bg-rose-500' },
+}
 
 const DailyLogCard = () => {
     const { t } = useLanguage()
+    const { profile, refreshProfile } = useAuth()
+
+    // Step 1: Vitals
     const [systolic, setSystolic] = useState('')
     const [diastolic, setDiastolic] = useState('')
     const [heartRate, setHeartRate] = useState('')
+
+    // Step 2: Lifestyle
+    const [dailySteps, setDailySteps] = useState('')
+    const [sleepHours, setSleepHours] = useState('')
+    const [medications, setMedications] = useState('')
+
+    // Step 3: Symptoms
     const [symptoms, setSymptoms] = useState<string[]>([])
-    const [submitted, setSubmitted] = useState(false)
+    const [notes, setNotes] = useState('')
+
+    // UI state
+    const [step, setStep] = useState<Step>(1)
     const [loading, setLoading] = useState(false)
-    const [step, setStep] = useState<1 | 2>(1)
+    const [error, setError] = useState('')
+    const [aiResult, setAiResult] = useState<AiRiskUpdate | null>(null)
 
     const toggleSymptom = (s: string) =>
         setSymptoms(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         setLoading(true)
-        setTimeout(() => { setLoading(false); setSubmitted(true) }, 1200)
+        setError('')
+        try {
+            const result = await medicalService.submitVitals({
+                systolic: parseInt(systolic),
+                diastolic: parseInt(diastolic),
+                heartRate: heartRate ? parseInt(heartRate) : undefined,
+                dailySteps: dailySteps ? parseInt(dailySteps) : undefined,
+                sleepHours: sleepHours ? parseFloat(sleepHours) : undefined,
+                medications: medications || undefined,
+                symptoms,
+                notes: notes || undefined,
+            })
+            setAiResult(result.riskUpdate)
+            // Refresh sidebar risk level
+            await refreshProfile()
+        } catch (err: any) {
+            setError(err?.response?.data?.message ?? 'Submission failed. Please try again.')
+        } finally {
+            setLoading(false)
+        }
     }
 
     const reset = () => {
-        setSubmitted(false); setSystolic(''); setDiastolic('')
-        setHeartRate(''); setSymptoms([]); setStep(1)
+        setSystolic(''); setDiastolic(''); setHeartRate('')
+        setDailySteps(''); setSleepHours(''); setMedications('')
+        setSymptoms([]); setNotes(''); setStep(1); setAiResult(null); setError('')
     }
 
-    if (submitted) {
+    // ── AI Result card ────────────────────────────────────────────────────────
+    if (aiResult) {
+        const level = aiResult.level
+        const cfg = RISK_STYLES[level]
+        const Icon = cfg.icon
+        const labels = { STABLE: 'Stable', ELEVATED: 'Elevated Risk', HIGH: 'High Risk' }
+
         return (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8 flex flex-col items-center text-center gap-4 shadow-sm h-full justify-center">
-                <div className="relative">
-                    <div className="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-md">
-                        <CheckCircle2 className="w-8 h-8 text-white" />
+            <div className={`rounded-2xl border ${cfg.border} ${cfg.bg} p-5 sm:p-6 flex flex-col gap-4 shadow-sm h-full`}>
+                {/* Header */}
+                <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${level === 'STABLE' ? 'bg-emerald-600' : level === 'ELEVATED' ? 'bg-amber-500' : 'bg-rose-500'}`}>
+                        <Icon className="w-5 h-5 text-white" />
                     </div>
-                    <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 animate-ping" />
+                    <div>
+                        <h3 className="text-base font-bold text-slate-900">Vitals Logged & Analyzed</h3>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className={`w-2 h-2 rounded-full ${cfg.dot} animate-pulse`} />
+                            <span className={`text-xs font-semibold uppercase tracking-wide ${cfg.badge.split(' ')[1]}`}>{labels[level]}</span>
+                        </div>
+                    </div>
+                    <span className={`ml-auto text-lg font-black ${cfg.badge.split(' ')[1]}`}>{aiResult.score}/100</span>
                 </div>
+
+                {/* Score bar */}
+                <div className="w-full bg-slate-200 rounded-full h-2">
+                    <div
+                        className={`h-2 rounded-full transition-all ${level === 'STABLE' ? 'bg-emerald-500' : level === 'ELEVATED' ? 'bg-amber-500' : 'bg-rose-500'}`}
+                        style={{ width: `${aiResult.score}%` }}
+                    />
+                </div>
+
+                {/* Justification */}
+                <p className="text-slate-700 text-sm leading-relaxed">{aiResult.justification}</p>
+
+                {/* Urgent banner */}
+                {aiResult.isUrgent && (
+                    <div className="flex items-start gap-2.5 bg-rose-100 border border-rose-300 rounded-xl px-3 py-2.5">
+                        <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                        <p className="text-rose-700 text-xs font-semibold">Please contact your doctor or caregiver immediately.</p>
+                    </div>
+                )}
+
+                {/* Prevention steps */}
                 <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-1">{t('dashboard.vitals.successTitle')}</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed">
-                        {t('dashboard.vitals.successSubtitle')}
-                    </p>
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Stroke Prevention Steps</p>
+                    <ul className="space-y-1.5">
+                        {aiResult.strokePreventionSteps.map((step, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                                <span className="mt-1 w-4 h-4 rounded-full bg-emerald-600 flex items-center justify-center text-white text-[9px] font-bold shrink-0">{i + 1}</span>
+                                {step}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-                <div className="flex items-center gap-2 bg-white border border-emerald-200 rounded-2xl px-4 py-2">
-                    <span className="text-2xl">🔥</span>
-                    <div className="text-left">
-                        <p className="text-slate-800 font-bold text-sm">
-                            {(MOCK_PATIENT.streakDays + 1).toString()}-{'day streak!'}
+
+                {/* Streak & log again */}
+                <div className="flex items-center justify-between border-t border-slate-200 pt-3 mt-auto">
+                    <div className="flex items-center gap-1.5">
+                        <span>🔥</span>
+                        <p className="text-slate-600 text-xs font-semibold">
+                            Great job, {profile?.firstName || 'Patient'}!
                         </p>
-                        <p className="text-slate-400 text-xs">Keep it up, {MOCK_PATIENT.name}</p>
                     </div>
+                    <button onClick={reset} className="text-sm text-emerald-600 font-semibold hover:underline">
+                        {t('dashboard.vitals.submitAnother')}
+                    </button>
                 </div>
-                <button onClick={reset} className="text-sm text-emerald-600 font-semibold hover:underline">
-                    {t('dashboard.vitals.submitAnother')}
-                </button>
             </div>
         )
     }
+
+    // ── Form ──────────────────────────────────────────────────────────────────
+    const step1Valid = !!systolic && !!diastolic && !!heartRate
+    const step2Valid = true // lifestyle fields are optional
+    const TOTAL_STEPS = 3
 
     return (
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm ring-1 ring-slate-50 flex flex-col">
@@ -72,16 +163,16 @@ const DailyLogCard = () => {
                 </div>
                 {/* Step dots */}
                 <div className="flex items-center gap-1.5">
-                    {[1, 2].map(s => (
-                        <div key={s} className={`h-1.5 rounded-full transition-all ${step === s ? 'w-6 bg-emerald-500' : 'w-3 bg-slate-200'}`} />
+                    {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map(s => (
+                        <div key={s} className={`h-1.5 rounded-full transition-all ${step === s ? 'w-6 bg-emerald-500' : step > s ? 'w-3 bg-emerald-300' : 'w-3 bg-slate-200'}`} />
                     ))}
                 </div>
             </div>
 
             <div className="flex-1 p-4 sm:p-6">
-                {step === 1 ? (
+                {/* ── STEP 1: Blood Pressure & Heart Rate ── */}
+                {step === 1 && (
                     <div className="space-y-5">
-                        {/* BP */}
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
                                 {t('dashboard.vitals.bloodPressure')} <span className="text-slate-400 font-normal">(mmHg)</span>
@@ -105,7 +196,6 @@ const DailyLogCard = () => {
                                 </p>
                             )}
                         </div>
-                        {/* Heart Rate */}
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-2">
                                 {t('dashboard.vitals.heartRate')} <span className="text-slate-400 font-normal">(bpm)</span>
@@ -118,13 +208,69 @@ const DailyLogCard = () => {
                         </div>
                         <button
                             onClick={() => setStep(2)}
-                            disabled={!systolic || !diastolic || !heartRate}
-                            className="w-full bg-emerald-600 text-white font-bold py-4 rounded-2xl hover:bg-emerald-700 transition-all shadow-md disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+                            disabled={!step1Valid}
+                            className="w-full bg-emerald-600 text-white font-bold py-4 rounded-2xl hover:bg-emerald-700 transition-all shadow-md disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-2"
                         >
-                            {t('dashboard.vitals.nextSymptoms')}
+                            Next <ChevronRight className="w-4 h-4" />
                         </button>
                     </div>
-                ) : (
+                )}
+
+                {/* ── STEP 2: Lifestyle ── */}
+                {step === 2 && (
+                    <div className="space-y-5">
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                <Activity className="inline w-4 h-4 mr-1 text-emerald-500" />
+                                Daily Steps <span className="text-slate-400 font-normal">(optional)</span>
+                            </label>
+                            <input
+                                type="number" placeholder="e.g. 8000" value={dailySteps}
+                                onChange={e => setDailySteps(e.target.value)}
+                                className="w-full text-base border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 placeholder:text-slate-300"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                Sleep Hours <span className="text-slate-400 font-normal">(optional)</span>
+                            </label>
+                            <input
+                                type="number" step="0.5" placeholder="e.g. 7.5" value={sleepHours}
+                                onChange={e => setSleepHours(e.target.value)}
+                                className="w-full text-base border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 placeholder:text-slate-300"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                                <Pill className="inline w-4 h-4 mr-1 text-emerald-500" />
+                                Current Medications <span className="text-slate-400 font-normal">(optional)</span>
+                            </label>
+                            <input
+                                type="text" placeholder="e.g. Amlodipine 5mg" value={medications}
+                                onChange={e => setMedications(e.target.value)}
+                                className="w-full text-base border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 placeholder:text-slate-300"
+                            />
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                            <button
+                                onClick={() => setStep(1)}
+                                className="flex-1 min-w-[100px] bg-slate-50 border border-slate-200 text-slate-600 font-semibold py-3.5 rounded-2xl hover:bg-slate-100 transition-all flex items-center justify-center gap-1"
+                            >
+                                <ChevronLeft className="w-4 h-4" /> Back
+                            </button>
+                            <button
+                                onClick={() => setStep(3)}
+                                disabled={!step2Valid}
+                                className="flex-1 min-w-[140px] bg-emerald-600 text-white font-bold py-3.5 rounded-2xl hover:bg-emerald-700 transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
+                            >
+                                Next <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* ── STEP 3: Symptoms & Submit ── */}
+                {step === 3 && (
                     <div className="space-y-5">
                         <div>
                             <label className="block text-sm font-semibold text-slate-700 mb-3">
@@ -141,8 +287,7 @@ const DailyLogCard = () => {
                                             : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-slate-300'
                                             }`}
                                     >
-                                        <span className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-all ${symptoms.includes(s) ? 'bg-rose-500 border-rose-500' : 'border-slate-300'
-                                            }`}>
+                                        <span className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-all ${symptoms.includes(s) ? 'bg-rose-500 border-rose-500' : 'border-slate-300'}`}>
                                             {symptoms.includes(s) && <CheckCircle2 className="w-3 h-3 text-white" />}
                                         </span>
                                         <span className="truncate">{s}</span>
@@ -150,12 +295,27 @@ const DailyLogCard = () => {
                                 ))}
                             </div>
                         </div>
+
+                        <textarea
+                            placeholder="Any additional notes for your doctor... (optional)"
+                            value={notes}
+                            onChange={e => setNotes(e.target.value)}
+                            rows={2}
+                            className="w-full text-sm border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 placeholder:text-slate-300 resize-none"
+                        />
+
+                        {error && (
+                            <p className="text-rose-600 text-xs flex items-center gap-1.5">
+                                <AlertTriangle className="w-3.5 h-3.5" /> {error}
+                            </p>
+                        )}
+
                         <div className="flex flex-wrap gap-3">
                             <button
-                                onClick={() => setStep(1)}
-                                className="flex-1 min-w-[100px] bg-slate-50 border border-slate-200 text-slate-600 font-semibold py-3.5 rounded-2xl hover:bg-slate-100 transition-all"
+                                onClick={() => setStep(2)}
+                                className="flex-1 min-w-[100px] bg-slate-50 border border-slate-200 text-slate-600 font-semibold py-3.5 rounded-2xl hover:bg-slate-100 transition-all flex items-center justify-center gap-1"
                             >
-                                {t('dashboard.vitals.back')}
+                                <ChevronLeft className="w-4 h-4" /> {t('dashboard.vitals.back')}
                             </button>
                             <button
                                 onClick={handleSubmit}

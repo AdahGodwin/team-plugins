@@ -14,7 +14,6 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
     )
     const [isSpeaking, setIsSpeaking]    = useState(false)
 
-    // Apply text size to root element
     useEffect(() => {
         const root = document.documentElement
         if (textSize === 'large') {
@@ -27,7 +26,6 @@ export function AccessibilityProvider({ children }: { children: ReactNode }) {
 
     const setTextSize = (s: TextSize) => setTextSizeState(s)
 
-    // Text-to-Speech
     const speak = useCallback((text: string) => {
         if (!window.speechSynthesis) return
         window.speechSynthesis.cancel()

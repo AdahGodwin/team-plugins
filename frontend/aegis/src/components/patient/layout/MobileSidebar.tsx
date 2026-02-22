@@ -13,6 +13,7 @@ import LogoutModal from "../../auth/modal/LogoutModal";
 import { MOCK_PATIENT, RISK_CONFIG } from "../data/mockData";
 import AccessibilityBar from "../../common/AccessibilityBar";
 import { useLanguage } from "../../../i18n/LanguageContext";
+import { useAuth } from "../../../context/AuthContext";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -61,6 +62,7 @@ const MobileSidebar = ({ onClose, unreadCount }: MobileSidebarProps) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useLanguage();
+  const { logout } = useAuth();
   const [showLogout, setShowLogout] = useState(false);
 
   const handleNav = (path: string) => {
@@ -181,7 +183,7 @@ const MobileSidebar = ({ onClose, unreadCount }: MobileSidebarProps) => {
           onConfirm={() => {
             setShowLogout(false);
             onClose();
-            navigate("/auth/login");
+            logout(); // clears cookies + redirects to /auth
           }}
           onCancel={() => setShowLogout(false)}
         />

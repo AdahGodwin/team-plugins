@@ -1,12 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Lock, User, Mail, Phone, Eye, EyeOff,
-  Heart, CheckCircle2, AlertCircle, ArrowRight, Stethoscope,
+  Heart, CheckCircle2, AlertCircle, ArrowRight, Stethoscope, Loader2,
+  Building2, ChevronDown,
 } from "lucide-react";
 import PasswordStrength from "../shared/PasswordStrength";
 import InputField from "../shared/InputField";
 import SectionHeading from "../shared/SectionHeading";
 import { useLanguage } from "../../i18n/LanguageContext";
+import { register, fetchHospitals } from "../../api/authService";
+import { useAuth } from "../../context/AuthContext";
+import type { Hospital } from "../../types/auth.types";
 
 interface Props {
   onGoLogin: () => void;
@@ -14,11 +18,14 @@ interface Props {
 
 export default function RegisterForm({ onGoLogin }: Props) {
   const { t } = useLanguage();
+  const { syncUser } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [consentHealth, setConsentHealth] = useState(false);
   const [consentTerms, setConsentTerms] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const [form, setForm] = useState({
     fullName: "", email: "", phone: "",
@@ -27,8 +34,21 @@ export default function RegisterForm({ onGoLogin }: Props) {
   });
 
   const [errors, setErrors] = useState<Partial<typeof form> & {
-    consentHealth?: string; consentTerms?: string;
+    consentHealth?: string; consentTerms?: string; hospitalId?: string;
   }>({});
+
+  // ── Hospital select ───────────────────────────────────────────────────────
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [hospitalId, setHospitalId] = useState("");
+  const [hospitalsLoading, setHospitalsLoading] = useState(true);
+  const [hospitalsError, setHospitalsError] = useState("");
+
+  useEffect(() => {
+    fetchHospitals()
+      .then(setHospitals)
+      .catch(() => setHospitalsError("Could not load hospitals. Please refresh."))
+      .finally(() => setHospitalsLoading(false));
+  }, []);
 
   const update = (field: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,6 +63,7 @@ export default function RegisterForm({ onGoLogin }: Props) {
     if (!/^\+?[\d\s\-]{7,15}$/.test(form.phone)) e.phone = "Enter a valid phone number.";
     if (form.password.length < 8) e.password = "Password must be at least 8 characters.";
     if (form.confirmPassword !== form.password) e.confirmPassword = "Passwords do not match.";
+    if (!hospitalId) e.hospitalId = "Please select your hospital.";
     if (!form.kinName.trim()) e.kinName = "Next of kin full name is required.";
     if (!/^\+?[\d\s\-]{7,15}$/.test(form.kinPhone)) e.kinPhone = "Enter a valid phone number.";
     if (form.kinEmail && !/\S+@\S+\.\S+/.test(form.kinEmail)) e.kinEmail = "Enter a valid email.";
@@ -51,12 +72,44 @@ export default function RegisterForm({ onGoLogin }: Props) {
     return e;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
-    setSubmitted(true);
+    setApiError("");
+    setLoading(true);
+
+    // Split fullName into firstName / lastName
+    const nameParts = form.fullName.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || nameParts[0];
+
+    try {
+      await register({
+        firstName,
+        lastName,
+        email: form.email,
+        password: form.password,
+        phoneNumber: form.phone,
+        kinName: form.kinName,
+        kinPhone: form.kinPhone,
+        kinEmail: form.kinEmail,
+        hospitalId,
+        consentHealth,
+        consentTerms,
+      });
+      syncUser(); // sync AuthContext so ProtectedRoute sees the new user
+      setSubmitted(true);
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.message ??
+        err.response?.data?.error ??
+        "Registration failed. Please try again.";
+      setApiError(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) {
@@ -105,6 +158,14 @@ export default function RegisterForm({ onGoLogin }: Props) {
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 
+        {/* API Error Banner */}
+        {apiError && (
+          <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5">
+            <AlertCircle size={15} className="mt-0.5 shrink-0 text-red-500" />
+            <p className="text-sm font-medium text-red-600">{apiError}</p>
+          </div>
+        )}
+
         <div className="flex flex-col gap-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100 sm:rounded-2xl">
           <SectionHeading step="01" color="bg-emerald-500"
             title={t('auth.personalInfo' as any)} subtitle={t('auth.personalInfoSubtitle' as any)}
@@ -125,6 +186,54 @@ export default function RegisterForm({ onGoLogin }: Props) {
               value={form.phone} onChange={update("phone")} error={errors.phone}
               success={!!form.phone && !errors.phone && /^\+?[\d\s\-]{7,15}$/.test(form.phone)}
             />
+
+            {/* ── Hospital select ─────────────────────────────────────────── */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-700 sm:text-sm">
+                Hospital / Clinic
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                  <Building2 size={15} />
+                </div>
+                <select
+                  value={hospitalId}
+                  disabled={hospitalsLoading}
+                  onChange={(e) => {
+                    setHospitalId(e.target.value);
+                    if (errors.hospitalId) setErrors(p => ({ ...p, hospitalId: "" }));
+                  }}
+                  className={`w-full appearance-none rounded-xl border bg-white py-2.5 pl-9 pr-9 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-60
+                    ${errors.hospitalId ? "border-red-300 text-red-700" : hospitalId ? "border-emerald-300 text-slate-800" : "border-slate-200 text-slate-400"}`}
+                >
+                  <option value="">
+                    {hospitalsLoading ? "Loading hospitals…" : "Select your hospital"}
+                  </option>
+                  {hospitals.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {h.name}{h.address ? ` — ${h.address}` : ""}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                  {hospitalsLoading
+                    ? <Loader2 size={14} className="animate-spin" />
+                    : <ChevronDown size={14} />
+                  }
+                </div>
+              </div>
+              {hospitalsError && (
+                <p className="flex items-center gap-1 text-xs text-red-500">
+                  <AlertCircle size={12} /> {hospitalsError}
+                </p>
+              )}
+              {errors.hospitalId && (
+                <p className="flex items-center gap-1 text-xs text-red-500">
+                  <AlertCircle size={12} /> {errors.hospitalId}
+                </p>
+              )}
+            </div>
+            {/* ────────────────────────────────────────────────────────────── */}
             <div>
               <InputField label={t('auth.password' as any)} type={showPassword ? "text" : "password"}
                 placeholder="••••••••" hint="Min. 8 chars — uppercase, numbers & symbols."
@@ -242,10 +351,20 @@ export default function RegisterForm({ onGoLogin }: Props) {
         </div>
 
         <button type="submit"
-          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] sm:rounded-2xl sm:py-4"
+          disabled={loading}
+          className="group mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3.5 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed sm:rounded-2xl sm:py-4"
         >
-          {t('auth.createAccountTitle' as any)}
-          <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+          {loading ? (
+            <>
+              <Loader2 size={17} className="animate-spin" />
+              Creating account…
+            </>
+          ) : (
+            <>
+              {t('auth.createAccountTitle' as any)}
+              <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+            </>
+          )}
         </button>
 
         <p className="text-center text-sm text-slate-500">
