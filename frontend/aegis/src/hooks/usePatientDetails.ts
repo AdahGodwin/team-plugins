@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { fetchPatient, patchPatient } from '../api/patientService'
+import { fetchPatient, patchPatient, notifyCaregiver } from '../api/patientService'
 import type { ApiPatient } from '../types/patient.types'
 import { formatDate } from '../utils/dateUtils'
 
@@ -13,6 +13,7 @@ export function usePatientDetails(id: string | undefined) {
     const [statusValue, setStatusValue] = useState<NonNullable<ApiPatient['healthStatus']>>('Stable')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [toastMessage, setToastMessage] = useState<string | null>(null)
+    const [notifySending, setNotifySending] = useState(false)
 
     const showToast = (msg: string) => {
         setToastMessage(msg)
@@ -66,11 +67,23 @@ export function usePatientDetails(id: string | undefined) {
         }
     }
 
-    // ── Caretaker notification (UI only — no dedicated endpoint yet) ───────
-    const handleSendNotification = (message: string) => {
-        void message
-        showToast('Alert sent to caretaker.')
-        setIsModalOpen(false)
+    // ── Caretaker notification ─────────────────────────────────────────────
+    const handleSendNotification = async (message: string) => {
+        if (!patient) return
+        setNotifySending(true)
+        try {
+            await notifyCaregiver({ patientId: patient.id, adminNote: message })
+            showToast('✅ Alert sent to caregiver successfully.')
+            setIsModalOpen(false)
+        } catch (err: any) {
+            const msg =
+                err.response?.data?.error ??
+                err.response?.data?.message ??
+                'Failed to send alert. Please try again.'
+            showToast(`❌ ${msg}`)
+        } finally {
+            setNotifySending(false)
+        }
     }
 
     // ── Download report ────────────────────────────────────────────────────
@@ -140,6 +153,7 @@ export function usePatientDetails(id: string | undefined) {
         handleSaveNotes,
         handleSendNotification,
         handleDownloadReport,
+        notifySending,
     }
 }
 
