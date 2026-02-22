@@ -15,6 +15,7 @@ class PatientRegistrationForm(forms.ModelForm):
     phone_number = forms.CharField(max_length=15, required=True)
     address = forms.CharField(widget=forms.Textarea(attrs={'rows': 3}))
     caregiver_email = forms.EmailField(required=True)
+    
 
     class Meta:
         model = User
