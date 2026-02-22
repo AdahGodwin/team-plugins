@@ -5,11 +5,11 @@ import type {
   RegisterPayload,
   AuthResponse,
   AuthUser,
+  Hospital,
 } from "../types/auth.types";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Persist tokens + user info to cookies after a successful auth call */
 function persistSession(data: AuthResponse) {
   Cookies.set("aegis-token",   data.accessToken,            COOKIE_OPTS);
   Cookies.set("aegis-refresh", data.refreshToken,           REFRESH_COOKIE_OPTS);
@@ -75,7 +75,15 @@ export async function fetchMe(): Promise<AuthUser> {
   return data;
 }
 
-// ─── Dev / Seed ───────────────────────────────────────────────────────────────
+/**
+ * GET /hospitals
+ * Returns the list of registered hospitals for the registration select field.
+ */
+export async function fetchHospitals(): Promise<Hospital[]> {
+  const { data } = await client.get<Hospital[]>("/hospitals");
+  return data;
+}
+
 
 const SEED_ADMIN_PAYLOAD = {
   firstName:       "Sarah",

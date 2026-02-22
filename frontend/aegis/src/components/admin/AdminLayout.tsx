@@ -2,14 +2,21 @@ import { useState } from 'react'
 import { useLocation, Outlet } from 'react-router-dom'
 import { Menu, X, ChevronRight } from 'lucide-react'
 import AdminSidebar from './AdminSidebar'
+import { useAuth } from '../../context/AuthContext'
 
 export default function AdminLayout() {
     const { pathname } = useLocation()
     const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+    const { user } = useAuth()
+
+    const displayName = user
+        ? `${user.title ? user.title + '. ' : ''}${user.fullName}`
+        : '…'
+    const displayRole = user?.jobTitle ?? user?.specialty ?? 'Clinical Coordinator'
+    const avatarLetter = user?.fullName?.[0]?.toUpperCase() ?? '?'
 
     const closeDrawer = () => setIsDrawerOpen(false)
 
-    // Build human-readable breadcrumb from the path, skipping "admin"
     const breadcrumbSegments = pathname.split('/').filter(Boolean).slice(1)
 
     return (
@@ -61,11 +68,11 @@ export default function AdminLayout() {
                     {/* Identity chip — always show avatar, show name only on sm+ */}
                     <div className="flex items-center gap-2 shrink-0">
                         <div className="hidden sm:block text-right">
-                            <p className="text-xs font-semibold text-slate-800 leading-none">Dr. Admin</p>
-                            <p className="text-[10px] text-slate-400">Clinical Coordinator</p>
+                            <p className="text-xs font-semibold text-slate-800 leading-none">{displayName}</p>
+                            <p className="text-[10px] text-slate-400">{displayRole}</p>
                         </div>
                         <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                            A
+                            {avatarLetter}
                         </div>
                     </div>
                 </header>

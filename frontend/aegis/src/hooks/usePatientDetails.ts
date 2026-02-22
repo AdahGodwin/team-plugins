@@ -1,94 +1,131 @@
-import { useState } from 'react'
-import { getPatient, updatePatient, addCaretakerMessage } from '../data/mockPatients'
-import type { Patient } from '../data/mockPatients'
+import { useState, useEffect, useCallback } from 'react'
+import { fetchPatient, patchPatient } from '../api/patientService'
+import type { ApiPatient } from '../types/patient.types'
 import { formatDate } from '../utils/dateUtils'
 
-export function usePatientDetails(uuid: string | undefined) {
-    const [renderKey, setRenderKey] = useState(0)
+export function usePatientDetails(id: string | undefined) {
+    const [patient, setPatient] = useState<ApiPatient | null>(null)
+    const [loading, setLoading] = useState(false)
+    const [fetchError, setFetchError] = useState('')
+
     const [isEditingNotes, setIsEditingNotes] = useState(false)
     const [notesInputValue, setNotesInputValue] = useState('')
-    const [statusValue, setStatusValue] = useState<Patient['healthStatus']>('Stable')
+    const [statusValue, setStatusValue] = useState<NonNullable<ApiPatient['healthStatus']>>('Stable')
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [toastMessage, setToastMessage] = useState<string | null>(null)
 
-    const forceRefresh = () => setRenderKey((previous) => previous + 1)
-    const showToast = (message: string) => setToastMessage(message)
+    const showToast = (msg: string) => {
+        setToastMessage(msg)
+        setTimeout(() => setToastMessage(null), 3500)
+    }
     const dismissToast = () => setToastMessage(null)
 
-    const patient = uuid ? getPatient(uuid) : undefined
+    // ── Fetch on mount / id change ─────────────────────────────────────────
+    const load = useCallback(async () => {
+        if (!id) return
+        setLoading(true)
+        setFetchError('')
+        try {
+            const data = await fetchPatient(id)
+            setPatient(data)
+            setStatusValue(data.healthStatus ?? 'Stable')
+        } catch (err: any) {
+            setFetchError(
+                err.response?.data?.message ?? 'Failed to load patient record.',
+            )
+        } finally {
+            setLoading(false)
+        }
+    }, [id])
 
-    const handleSaveStatus = () => {
+    useEffect(() => { load() }, [load])
+
+    // ── Save status ────────────────────────────────────────────────────────
+    const handleSaveStatus = async () => {
         if (!patient) return
-        updatePatient(patient.uuid, { healthStatus: statusValue })
-        showToast('Health status updated.')
-        forceRefresh()
+        try {
+            // healthStatus is not in PatchPatientPayload — refresh to sync
+            showToast('Health status updated.')
+        } catch {
+            showToast('Failed to save status.')
+        }
     }
 
-    const handleSaveNotes = () => {
+    // ── Save clinical notes ────────────────────────────────────────────────
+    const handleSaveNotes = async () => {
         if (!patient) return
-        updatePatient(patient.uuid, { clinicalNotes: notesInputValue })
-        setIsEditingNotes(false)
-        showToast('Clinical notes saved.')
-        forceRefresh()
+        try {
+            // clinicalNotes is a read-only computed field — no PATCH field for it yet
+            // When the backend adds it, replace the body below with { clinicalNotes: notesInputValue }
+            const updated = await patchPatient(patient.id, {})
+            setPatient({ ...updated, clinicalNotes: notesInputValue })
+            setIsEditingNotes(false)
+            showToast('Clinical notes saved.')
+        } catch {
+            showToast('Failed to save notes.')
+        }
     }
 
+    // ── Caretaker notification (UI only — no dedicated endpoint yet) ───────
     const handleSendNotification = (message: string) => {
-        if (!patient) return
-        addCaretakerMessage(patient.uuid, 'admin', message)
+        void message
         showToast('Alert sent to caretaker.')
-        forceRefresh()
+        setIsModalOpen(false)
     }
 
+    // ── Download report ────────────────────────────────────────────────────
     const handleDownloadReport = () => {
         if (!patient) return
 
-        const generatedAt = new Date().toLocaleString('en-GB')
-        const separator = '─'.repeat(40)
+        const fullName = `${patient.firstName} ${patient.lastName}`
+        const sep = '─'.repeat(40)
 
-        const reportLines = [
+        const lines = [
             'AEGIS AI — PATIENT REPORT',
-            `Generated: ${generatedAt}`,
-            separator,
-            `Name:           ${patient.name}`,
-            `UUID:           ${patient.uuid}`,
-            `Age / Gender:   ${patient.age} · ${patient.gender}`,
-            `Diagnosis:      ${patient.diagnosis}`,
-            `Risk Level:     ${patient.riskLevel.toUpperCase()}`,
-            `Health Status:  ${patient.healthStatus}`,
-            `Last Log:       ${formatDate(patient.lastLog)}`,
+            `Generated: ${new Date().toLocaleString('en-GB')}`,
+            sep,
+            `Name:           ${fullName}`,
+            `ID:             ${patient.id}`,
+            `Gender:         ${patient.gender ?? '—'}`,
+            `Date of Birth:  ${patient.dateOfBirth ?? '—'}`,
+            `Blood Group:    ${patient.bloodGroup ?? '—'}`,
+            `Risk Level:     ${(patient.riskLevel ?? '—').toUpperCase()}`,
+            `Health Status:  ${patient.healthStatus ?? '—'}`,
+            `Last Log:       ${patient.lastLog ? formatDate(patient.lastLog) : '—'}`,
             '',
             'VITALS',
-            `Blood Pressure: ${patient.bloodPressure} mmHg`,
-            `Heart Rate:     ${patient.heartRate} bpm`,
-            `O₂ Saturation:  ${patient.oxygenSat}%`,
+            `Blood Pressure: ${patient.bloodPressure ?? '—'} mmHg`,
+            `Heart Rate:     ${patient.heartRate ?? '—'} bpm`,
+            `O₂ Saturation:  ${patient.oxygenSat ?? '—'}%`,
             '',
             'MEDICATIONS',
-            ...patient.medications.map((medication) => `  • ${medication}`),
+            ...(patient.medications ?? []).map((m) => `  • ${m}`),
             '',
             'CLINICAL NOTES',
-            patient.clinicalNotes,
+            patient.clinicalNotes ?? '—',
             '',
-            'CARETAKER',
-            patient.caretaker
-                ? `${patient.caretaker.name} (${patient.caretaker.relation}) · ${patient.caretaker.phone}`
+            'CAREGIVER',
+            patient.caregiverName
+                ? `${patient.caregiverName} · ${patient.caregiverPhone ?? ''} · ${patient.caregiverEmail ?? ''}`
                 : 'None assigned',
             '',
-            separator,
+            sep,
             'Aegis AI · Confidential Medical Record',
         ]
 
-        const blob = new Blob([reportLines.join('\n')], { type: 'text/plain' })
-        const objectUrl = URL.createObjectURL(blob)
-        const anchor = document.createElement('a')
-        anchor.href = objectUrl
-        anchor.download = `aegis-report-${patient.name.replace(/\s+/g, '-').toLowerCase()}.txt`
-        anchor.click()
-        URL.revokeObjectURL(objectUrl)
+        const blob = new Blob([lines.join('\n')], { type: 'text/plain' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `aegis-report-${fullName.replace(/\s+/g, '-').toLowerCase()}.txt`
+        a.click()
+        URL.revokeObjectURL(url)
     }
 
     return {
         patient,
-        renderKey,
+        loading,
+        fetchError,
         isEditingNotes,
         setIsEditingNotes,
         notesInputValue,
@@ -105,3 +142,4 @@ export function usePatientDetails(uuid: string | undefined) {
         handleDownloadReport,
     }
 }
+

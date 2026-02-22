@@ -14,18 +14,35 @@ export interface RegisterPayload {
   kinName?: string;
   kinPhone?: string;
   kinEmail?: string;
+  hospitalId: string;
   consentHealth: boolean;
   consentTerms: boolean;
+}
+
+// ─── Hospital ─────────────────────────────────────────────────────────────────
+
+export interface Hospital {
+  id: string;
+  name: string;
+  address?: string;
 }
 
 // ─── Response Shapes ─────────────────────────────────────────────────────────
 
 export interface AuthUser {
   id: string;
-  patientId: string;
+  patientId?: string;   // present for patient role
+  adminId?: string;     // present for admin role
   fullName: string;
   email: string;
   role: "patient" | "admin";
+  // Admin-specific fields (present when role === "admin")
+  title?: string;
+  jobTitle?: string;
+  specialty?: string;
+  department?: string;
+  hospitalName?: string;
+  isVerified?: boolean;
 }
 
 export interface AuthResponse {

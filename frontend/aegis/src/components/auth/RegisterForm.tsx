@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Lock, User, Mail, Phone, Eye, EyeOff,
   Heart, CheckCircle2, AlertCircle, ArrowRight, Stethoscope, Loader2,
+  Building2, ChevronDown,
 } from "lucide-react";
 import PasswordStrength from "../shared/PasswordStrength";
 import InputField from "../shared/InputField";
 import SectionHeading from "../shared/SectionHeading";
 import { useLanguage } from "../../i18n/LanguageContext";
-import { register } from "../../api/authService";
+import { register, fetchHospitals } from "../../api/authService";
 import { useAuth } from "../../context/AuthContext";
+import type { Hospital } from "../../types/auth.types";
 
 interface Props {
   onGoLogin: () => void;
@@ -32,8 +34,21 @@ export default function RegisterForm({ onGoLogin }: Props) {
   });
 
   const [errors, setErrors] = useState<Partial<typeof form> & {
-    consentHealth?: string; consentTerms?: string;
+    consentHealth?: string; consentTerms?: string; hospitalId?: string;
   }>({});
+
+  // ── Hospital select ───────────────────────────────────────────────────────
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [hospitalId, setHospitalId] = useState("");
+  const [hospitalsLoading, setHospitalsLoading] = useState(true);
+  const [hospitalsError, setHospitalsError] = useState("");
+
+  useEffect(() => {
+    fetchHospitals()
+      .then(setHospitals)
+      .catch(() => setHospitalsError("Could not load hospitals. Please refresh."))
+      .finally(() => setHospitalsLoading(false));
+  }, []);
 
   const update = (field: keyof typeof form) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,6 +63,7 @@ export default function RegisterForm({ onGoLogin }: Props) {
     if (!/^\+?[\d\s\-]{7,15}$/.test(form.phone)) e.phone = "Enter a valid phone number.";
     if (form.password.length < 8) e.password = "Password must be at least 8 characters.";
     if (form.confirmPassword !== form.password) e.confirmPassword = "Passwords do not match.";
+    if (!hospitalId) e.hospitalId = "Please select your hospital.";
     if (!form.kinName.trim()) e.kinName = "Next of kin full name is required.";
     if (!/^\+?[\d\s\-]{7,15}$/.test(form.kinPhone)) e.kinPhone = "Enter a valid phone number.";
     if (form.kinEmail && !/\S+@\S+\.\S+/.test(form.kinEmail)) e.kinEmail = "Enter a valid email.";
@@ -79,6 +95,7 @@ export default function RegisterForm({ onGoLogin }: Props) {
         kinName: form.kinName,
         kinPhone: form.kinPhone,
         kinEmail: form.kinEmail,
+        hospitalId,
         consentHealth,
         consentTerms,
       });
@@ -169,6 +186,54 @@ export default function RegisterForm({ onGoLogin }: Props) {
               value={form.phone} onChange={update("phone")} error={errors.phone}
               success={!!form.phone && !errors.phone && /^\+?[\d\s\-]{7,15}$/.test(form.phone)}
             />
+
+            {/* ── Hospital select ─────────────────────────────────────────── */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-slate-700 sm:text-sm">
+                Hospital / Clinic
+              </label>
+              <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                  <Building2 size={15} />
+                </div>
+                <select
+                  value={hospitalId}
+                  disabled={hospitalsLoading}
+                  onChange={(e) => {
+                    setHospitalId(e.target.value);
+                    if (errors.hospitalId) setErrors(p => ({ ...p, hospitalId: "" }));
+                  }}
+                  className={`w-full appearance-none rounded-xl border bg-white py-2.5 pl-9 pr-9 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 disabled:cursor-not-allowed disabled:opacity-60
+                    ${errors.hospitalId ? "border-red-300 text-red-700" : hospitalId ? "border-emerald-300 text-slate-800" : "border-slate-200 text-slate-400"}`}
+                >
+                  <option value="">
+                    {hospitalsLoading ? "Loading hospitals…" : "Select your hospital"}
+                  </option>
+                  {hospitals.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {h.name}{h.address ? ` — ${h.address}` : ""}
+                    </option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                  {hospitalsLoading
+                    ? <Loader2 size={14} className="animate-spin" />
+                    : <ChevronDown size={14} />
+                  }
+                </div>
+              </div>
+              {hospitalsError && (
+                <p className="flex items-center gap-1 text-xs text-red-500">
+                  <AlertCircle size={12} /> {hospitalsError}
+                </p>
+              )}
+              {errors.hospitalId && (
+                <p className="flex items-center gap-1 text-xs text-red-500">
+                  <AlertCircle size={12} /> {errors.hospitalId}
+                </p>
+              )}
+            </div>
+            {/* ────────────────────────────────────────────────────────────── */}
             <div>
               <InputField label={t('auth.password' as any)} type={showPassword ? "text" : "password"}
                 placeholder="••••••••" hint="Min. 8 chars — uppercase, numbers & symbols."

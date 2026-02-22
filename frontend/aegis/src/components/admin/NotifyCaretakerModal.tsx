@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { X, Bell, Send } from 'lucide-react'
-import type { Patient } from '../../data/mockPatients'
+import type { ApiPatient } from '../../types/patient.types'
 
 interface NotifyCaretakerModalProps {
-    patient: Patient
+    patient: ApiPatient
     onClose: () => void
     onSend: (message: string) => void
 }
@@ -11,8 +11,8 @@ interface NotifyCaretakerModalProps {
 export default function NotifyCaretakerModal({ patient, onClose, onSend }: NotifyCaretakerModalProps) {
     const [message, setMessage] = useState('')
     const backdropRef = useRef<HTMLDivElement>(null)
+    const fullName = `${patient.firstName} ${patient.lastName}`
 
-    // Close on Escape
     useEffect(() => {
         const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
         window.addEventListener('keydown', handler)
@@ -20,7 +20,7 @@ export default function NotifyCaretakerModal({ patient, onClose, onSend }: Notif
     }, [onClose])
 
     const handleSend = () => {
-        onSend(message.trim() || `Urgent: ${patient.name}'s risk level is HIGH. Please check in immediately.`)
+        onSend(message.trim() || `Urgent: ${fullName}'s risk level is HIGH. Please check in immediately.`)
         onClose()
     }
 
@@ -38,38 +38,37 @@ export default function NotifyCaretakerModal({ patient, onClose, onSend }: Notif
                             <Bell className="w-5 h-5 text-rose-500" />
                         </div>
                         <div>
-                            <h3 className="font-bold text-slate-900 text-base">Notify Caretaker</h3>
-                            <p className="text-slate-500 text-xs">Alerting caretaker for {patient.name}</p>
+                            <h3 className="font-bold text-slate-900 text-base">Notify Caregiver</h3>
+                            <p className="text-slate-500 text-xs">Alerting caregiver for {fullName}</p>
                         </div>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="text-slate-400 hover:text-slate-700 transition-colors"
-                    >
+                    <button onClick={onClose} className="text-slate-400 hover:text-slate-700 transition-colors">
                         <X className="w-5 h-5" />
                     </button>
                 </div>
 
-                {/* Caretaker info */}
-                {patient.caretaker ? (
+                {/* Caregiver info */}
+                {patient.caregiverName ? (
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-4 flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
-                            {patient.caretaker.name[0]}
+                            {patient.caregiverName[0]}
                         </div>
                         <div>
-                            <p className="text-slate-800 font-semibold text-sm">{patient.caretaker.name}</p>
-                            <p className="text-slate-500 text-xs">{patient.caretaker.relation} · {patient.caretaker.phone}</p>
+                            <p className="text-slate-800 font-semibold text-sm">{patient.caregiverName}</p>
+                            <p className="text-slate-500 text-xs">
+                                {[patient.caregiverPhone, patient.caregiverEmail].filter(Boolean).join(' · ')}
+                            </p>
                         </div>
                     </div>
                 ) : (
                     <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4 text-amber-700 text-sm">
-                        No caretaker assigned to this patient.
+                        No caregiver assigned to this patient.
                     </div>
                 )}
 
                 {/* Default alert preview */}
                 <div className="bg-rose-50 border border-rose-200 rounded-xl p-3 mb-4 text-rose-700 text-xs">
-                    Default alert: <span className="font-semibold">"{patient.name}'s risk level is HIGH. Please check in immediately."</span>
+                    Default alert: <span className="font-semibold">"{fullName}'s risk level is HIGH. Please check in immediately."</span>
                 </div>
 
                 {/* Optional message */}
@@ -80,21 +79,17 @@ export default function NotifyCaretakerModal({ patient, onClose, onSend }: Notif
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     rows={3}
-                    placeholder="Add specific instructions or context for the caretaker…"
+                    placeholder="Add specific instructions or context for the caregiver…"
                     className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100 resize-none transition-all mb-5"
                 />
 
-                {/* Actions */}
                 <div className="flex gap-3">
-                    <button
-                        onClick={onClose}
-                        className="flex-1 border border-slate-200 text-slate-600 font-semibold text-sm py-3 rounded-xl hover:bg-slate-50 transition-colors"
-                    >
+                    <button onClick={onClose} className="flex-1 border border-slate-200 text-slate-600 font-semibold text-sm py-3 rounded-xl hover:bg-slate-50 transition-colors">
                         Cancel
                     </button>
                     <button
                         onClick={handleSend}
-                        disabled={!patient.caretaker}
+                        disabled={!patient.caregiverName}
                         className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 text-white font-semibold text-sm py-3 rounded-xl hover:bg-emerald-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-sm"
                     >
                         <Send className="w-4 h-4" />
