@@ -114,7 +114,8 @@ class PredictHealthOutcomeView(APIView):
                 "stroke_prevention_steps": ai_analysis.get("stroke_prevention_steps", [])
             }
         }
-
+        vital_log.ai_analysis_report = ai_analysis  # Save the dictionary to the vital log
+        vital_log.save() # Save the vital_log instance after updating ai_analysis_report
         return Response(status_report, status=status.HTTP_201_CREATED)
 
 

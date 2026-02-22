@@ -1,0 +1,6 @@
+# requirements.in
+django
+djangorestframework
+google-generativeai
+apscheduler
+python-dotenv

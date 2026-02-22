@@ -37,8 +37,11 @@ class VitalSignLog(models.Model):
     medications = models.TextField(blank=True, null=True, help_text="Medications currently taken")
     signs_and_symptoms = models.TextField(blank=True, null=True, help_text="Any notable symptoms")
 
+    ai_analysis_report = models.JSONField(null=True, blank=True)
+    
     class Meta:
         ordering = ['-timestamp'] # Newest logs appear first
 
     def __str__(self):
         return f"Vitals for {self.patient.user.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+    
