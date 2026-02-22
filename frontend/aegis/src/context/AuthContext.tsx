@@ -1,76 +1,105 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { AuthResponse, PatientProfile } from '../api/types';
-import { authService } from '../api/services/auth';
-import { patientService } from '../api/services/patient';
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  type ReactNode,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import { clearSession, getStoredUser, fetchMe } from "../api/authService";
+import type { AuthUser } from "../types/auth.types";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AuthContextType {
-  user: AuthResponse | null;
-  profile: PatientProfile | null;
-  loading: boolean;
-  login: (payload: { username: string; password: string }) => Promise<void>;
+  user: AuthUser | null;
+  /** Shorthand — true when a user cookie exists */
+  isAuthenticated: boolean;
+  /** true when role === "admin" */
+  isAdmin: boolean;
+  /**
+   * Re-reads the aegis-user cookie and syncs state.
+   * Call this immediately after login() / register() completes.
+   */
+  syncUser: () => void;
+  /** Clears all session cookies and redirects to /auth */
   logout: () => void;
+  /**
+   * Hits GET /api/auth/me to get fresh user data from the server.
+   * Available so components can refresh after profile edits.
+   */
   refreshProfile: () => Promise<void>;
+  /** Alias kept for patient-side components that read `profile` */
+  profile: AuthUser | null;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// ─── Context ──────────────────────────────────────────────────────────────────
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthResponse | null>(null);
-  const [profile, setProfile] = useState<PatientProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+const AuthContext = createContext<AuthContextType | null>(null);
 
+// ─── Provider ─────────────────────────────────────────────────────────────────
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
+
+  // Seed from the cookie set during login / register
+  const [user, setUser] = useState<AuthUser | null>(() => getStoredUser());
+
+  /** On mount — if a token exists, hit /me to get fresh server-side user data */
   useEffect(() => {
-    const storedUser = localStorage.getItem('aegis_user');
-    const token = localStorage.getItem('aegis_token');
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
-      fetchProfile();
-    } else {
-      setLoading(false);
+    if (!getStoredUser()) return; // not logged in — skip
+    fetchMe()
+      .then(setUser)
+      .catch(() => {
+        // Token invalid / expired — clear stale session silently
+        clearSession();
+        setUser(null);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /** Re-reads the aegis-user cookie — call right after login() / register() */
+  const syncUser = useCallback(() => {
+    setUser(getStoredUser());
+  }, []);
+
+  const logout = useCallback(() => {
+    clearSession();
+    setUser(null);
+    navigate("/auth", { replace: true });
+  }, [navigate]);
+
+  const refreshProfile = useCallback(async () => {
+    try {
+      const fresh = await fetchMe();
+      setUser(fresh);
+    } catch {
+      // silently swallow — caller can handle if needed
     }
   }, []);
 
-  const fetchProfile = async () => {
-    try {
-      const profileData = await patientService.getProfile();
-      setProfile(profileData);
-    } catch (error) {
-      console.error('Failed to fetch profile', error);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const login = async (payload: { username: string; password: string }) => {
-    const data = await authService.login(payload);
-    localStorage.setItem('aegis_token', data.token);
-    localStorage.setItem('aegis_user', JSON.stringify(data));
-    setUser(data);
-    await fetchProfile();
-  };
-
-  const logout = () => {
-    authService.logout();
-    setUser(null);
-    setProfile(null);
-  };
-
-  const refreshProfile = async () => {
-    await fetchProfile();
-  };
-
   return (
-    <AuthContext.Provider value={{ user, profile, loading, login, logout, refreshProfile }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isAdmin: user?.role === "admin",
+        syncUser,
+        logout,
+        refreshProfile,
+        profile: user,   // alias for patient-side components
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
+// ─── Hook ─────────────────────────────────────────────────────────────────────
+
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
-};
+}
